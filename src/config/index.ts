@@ -38,9 +38,9 @@ export {
 
 // Panel configuration - imported from panels.ts
 export {
-  DEFAULT_PANELS,
-  DEFAULT_MAP_LAYERS,
-  MOBILE_DEFAULT_MAP_LAYERS,
+  getDefaultPanels,
+  getDefaultMapLayers,
+  getMobileDefaultMapLayers,
   LAYER_TO_SOURCE,
 } from './panels';
 

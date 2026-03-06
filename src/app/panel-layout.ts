@@ -57,7 +57,7 @@ import { escapeHtml } from '@/utils/sanitize';
 import {
   FEEDS,
   INTEL_SOURCES,
-  DEFAULT_PANELS,
+  getDefaultPanels,
   STORAGE_KEYS,
   SITE_VARIANT,
 } from '@/config';
@@ -171,6 +171,7 @@ export class PanelLayoutManager implements AppModule {
       })()}</div>
           <span class="logo">SENTINEL</span><span class="logo-mobile">Sentinel</span><span class="version">v${__APP_VERSION__}</span>${BETA_MODE ? '<span class="beta-badge">BETA</span>' : ''}
           <a href="https://x.com/koushikm_mondal" target="_blank" rel="noopener" class="credit-link">
+            <span class="globe-icon">🌍</span>
             <svg class="x-logo" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             <span class="credit-text">@koushik</span>
           </a>
@@ -209,7 +210,7 @@ export class PanelLayoutManager implements AppModule {
             <div class="download-dropdown" id="downloadDropdown"></div>
           </div>`}
           <button class="search-btn" id="searchBtn"><kbd>⌘K</kbd> ${t('header.search')}</button>
-          ${this.ctx.isDesktopApp ? '' : `<button class="copy-link-btn" id="copyLinkBtn">${t('header.copyLink')}</button>`}
+          ${this.ctx.isDesktopApp ? '' : `<button class="copy-link-btn" id="copyLinkBtn">🌐 ${t('header.copyLink')}</button>`}
           <button class="theme-toggle-btn" id="headerThemeToggle" title="${t('header.toggleTheme')}">
             ${getCurrentTheme() === 'dark'
         ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
@@ -620,7 +621,7 @@ export class PanelLayoutManager implements AppModule {
       if (!Array.isArray((FEEDS as Record<string, unknown>)[key])) continue;
       const panelKey = this.ctx.panels[key] && !this.ctx.newsPanels[key] ? `${key}-news` : key;
       if (this.ctx.panels[panelKey]) continue;
-      const panelConfig = DEFAULT_PANELS[panelKey] ?? DEFAULT_PANELS[key];
+      const panelConfig = getDefaultPanels()[panelKey] ?? getDefaultPanels()[key];
       const label = panelConfig?.name ?? key.charAt(0).toUpperCase() + key.slice(1);
       const panel = new NewsPanel(panelKey, label);
       this.attachRelatedAssetHandlers(panel);
@@ -799,7 +800,7 @@ export class PanelLayoutManager implements AppModule {
       this.ctx.panels['renewable'] = this.ctx.renewablePanel;
     }
 
-    const defaultOrder = Object.keys(DEFAULT_PANELS).filter(k => k !== 'map');
+    const defaultOrder = Object.keys(getDefaultPanels()).filter(k => k !== 'map');
     const savedOrder = this.getSavedPanelOrder();
     const savedBottomOrder = this.getSavedBottomPanelOrder();
     const isUltraWide = window.innerWidth >= 1600;
@@ -1000,7 +1001,7 @@ export class PanelLayoutManager implements AppModule {
       // Move everything from bottom grid back to panels grid in correct order
       const panelsInBottom = Array.from(bottomGrid.querySelectorAll('.panel')) as HTMLElement[];
       const savedOrder = this.getSavedPanelOrder();
-      const defaultOrder = Object.keys(DEFAULT_PANELS).filter(k => k !== 'map');
+      const defaultOrder = Object.keys(getDefaultPanels()).filter(k => k !== 'map');
 
       panelsInBottom.forEach(panelEl => {
         const id = panelEl.dataset.panel;

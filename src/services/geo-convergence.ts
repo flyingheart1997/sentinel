@@ -209,6 +209,8 @@ export function clearCells(): void {
   cells.clear();
 }
 
+export const clearCaches = clearCells;
+
 export function getCellCount(): number {
   return cells.size;
 }

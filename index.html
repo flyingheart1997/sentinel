@@ -85,10 +85,41 @@
     </script>
 
     <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/favico/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favico/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favico/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favico/apple-touch-icon.png" />
+    <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%22 y=%2250%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2280%22>🌍</text></svg>">
+
+    <script>
+      (function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        const favicon = document.getElementById('favicon');
+        let angle = 0;
+
+        function animate() {
+          if (document.hidden) {
+            setTimeout(() => requestAnimationFrame(animate), 1000);
+            return;
+          }
+
+          ctx.clearRect(0, 0, 32, 32);
+          ctx.save();
+          ctx.translate(16, 16);
+          ctx.rotate((angle * Math.PI) / 180);
+          ctx.font = '24px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('🌍', 0, 2); 
+          ctx.restore();
+          
+          favicon.href = canvas.toDataURL('image/png');
+          angle = (angle + 2) % 360;
+          setTimeout(() => requestAnimationFrame(animate), 100);
+        }
+        
+        setTimeout(animate, 1000);
+      })();
+    </script>
 
 
     <!-- Theme: apply stored preference before first paint to prevent FOUC -->
@@ -97,20 +128,20 @@
     <!-- Critical CSS: inline skeleton visible before JS boots -->
     <style>
       /* ---------- skeleton shell (dark default) ---------- */
-      .skeleton-shell{display:flex;flex-direction:column;height:100vh;background:#0a0a0a;font-family:'SF Mono','Monaco','Cascadia Code','Fira Code','DejaVu Sans Mono','Liberation Mono',monospace;overflow:hidden}
-      .skeleton-header{display:flex;align-items:center;justify-content:space-between;height:40px;padding:8px 16px;background:#141414;border-bottom:1px solid #2a2a2a;flex-shrink:0}
+      .skeleton-shell{display:flex;flex-direction:column;height:100vh;background:var(--bg);font-family:var(--font-mono);overflow:hidden}
+      .skeleton-header{display:flex;align-items:center;justify-content:space-between;height:40px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
       .skeleton-header-left{display:flex;align-items:center;gap:12px}
       .skeleton-header-right{display:flex;align-items:center;gap:12px}
-      .skeleton-pill{height:24px;border-radius:4px;background:#1e1e1e}
-      .skeleton-dot{width:8px;height:8px;border-radius:50%;background:#0f5040}
-      .skeleton-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0a0a0a}
-      .skeleton-map{height:50vh;min-height:200px;border:1px solid #2a2a2a;background:#020a08;display:flex;flex-direction:column;flex-shrink:0}
-      .skeleton-map-bar{height:32px;display:flex;align-items:center;padding:0 12px;background:#141414;border-bottom:1px solid #2a2a2a}
+      .skeleton-pill{height:24px;border-radius:4px;background:var(--surface-hover)}
+      .skeleton-dot{width:8px;height:8px;border-radius:50%;background:var(--status-live)}
+      .skeleton-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+      .skeleton-map{height:50vh;min-height:200px;border:1px solid var(--border);background:var(--map-bg);display:flex;flex-direction:column;flex-shrink:0}
+      .skeleton-map-bar{height:32px;display:flex;align-items:center;padding:0 12px;background:var(--surface);border-bottom:1px solid var(--border)}
       .skeleton-map-body{flex:1;position:relative;overflow:hidden}
-      .skeleton-map-body::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,#0a2a20 0%,#020a08 100%);opacity:.5}
+      .skeleton-map-body::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 50%,var(--map-grid) 0%,var(--map-bg) 100%);opacity:.5}
       .skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:4px;padding:4px;align-content:start}
-      .skeleton-panel{height:320px;background:#141414;border:1px solid #2a2a2a;border-radius:0;display:flex;flex-direction:column}
-      .skeleton-panel-header{height:36px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid #1a1a1a}
+      .skeleton-panel{height:320px;background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:0;display:flex;flex-direction:column}
+      .skeleton-panel-header{height:36px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid var(--border-subtle)}
       .skeleton-panel-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px}
       .skeleton-line{height:14px;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.05) 75%);background-size:200% 100%;animation:skel-shimmer 1.5s infinite}
       .skeleton-line.w75{width:75%}.skeleton-line.w60{width:60%}.skeleton-line.w50{width:50%}.skeleton-line.w85{width:85%}.skeleton-line.w40{width:40%}
@@ -118,16 +149,16 @@
       @keyframes skel-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
       /* ---------- skeleton shell (light theme) ---------- */
-      [data-theme="light"] .skeleton-shell{background:#f8f9fa}
-      [data-theme="light"] .skeleton-header{background:#fff;border-bottom-color:#d4d4d4}
-      [data-theme="light"] .skeleton-pill{background:#f0f0f0}
-      [data-theme="light"] .skeleton-dot{background:#16a34a}
-      [data-theme="light"] .skeleton-main{background:#f8f9fa}
-      [data-theme="light"] .skeleton-map{border-color:#d4d4d4;background:#e8f0f8}
-      [data-theme="light"] .skeleton-map-bar{background:#fff;border-bottom-color:#d4d4d4}
-      [data-theme="light"] .skeleton-map-body::after{background:radial-gradient(ellipse 60% 50% at 50% 50%,#b0c8d8 0%,#e8f0f8 100%)}
-      [data-theme="light"] .skeleton-panel{background:#fff;border-color:#d4d4d4}
-      [data-theme="light"] .skeleton-panel-header{border-bottom-color:#e8e8e8}
+      [data-theme="light"] .skeleton-shell{background:var(--bg)}
+      [data-theme="light"] .skeleton-header{background:var(--surface);border-bottom-color:var(--border)}
+      [data-theme="light"] .skeleton-pill{background:var(--surface-hover)}
+      [data-theme="light"] .skeleton-dot{background:var(--status-live)}
+      [data-theme="light"] .skeleton-main{background:var(--bg)}
+      [data-theme="light"] .skeleton-map{border-color:var(--border);background:var(--map-bg)}
+      [data-theme="light"] .skeleton-map-bar{background:var(--surface);border-bottom-color:var(--border)}
+      [data-theme="light"] .skeleton-map-body::after{background:radial-gradient(ellipse 60% 50% at 50% 50%,var(--map-grid) 0%,var(--map-bg) 100%)}
+      [data-theme="light"] .skeleton-panel{background:var(--panel-bg);border-color:var(--panel-border)}
+      [data-theme="light"] .skeleton-panel-header{border-bottom-color:var(--border-subtle)}
       [data-theme="light"] .skeleton-line{background:linear-gradient(90deg,rgba(0,0,0,.04) 25%,rgba(0,0,0,.08) 50%,rgba(0,0,0,.04) 75%);background-size:200% 100%;animation:skel-shimmer 1.5s infinite}
 
       /* ---------- skeleton shell (happy variant — light) ---------- */

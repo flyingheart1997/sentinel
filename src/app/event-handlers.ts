@@ -1,4 +1,5 @@
 import type { AppContext, AppModule } from '@/app/app-context';
+import { switchVariant } from '../app-orchestrator';
 import type { AirlineIntelPanel } from '@/components/AirlineIntelPanel';
 import type { PanelConfig } from '@/types';
 import type { MapView } from '@/components';
@@ -26,7 +27,7 @@ import {
   LAYER_TO_SOURCE,
   FEEDS,
   INTEL_SOURCES,
-  DEFAULT_PANELS,
+  getDefaultPanels,
 } from '@/config';
 import {
   saveSnapshot,
@@ -130,7 +131,7 @@ export class EventHandlerManager implements AppModule {
   }
 
   private toggleTvMode(): void {
-    const panelKeys = Object.keys(DEFAULT_PANELS).filter(
+    const panelKeys = Object.keys(getDefaultPanels()).filter(
       key => this.ctx.panelSettings[key]?.enabled !== false
     );
     if (!this.ctx.tvMode) {
@@ -290,8 +291,7 @@ export class EventHandlerManager implements AppModule {
           if (variant && variant !== SITE_VARIANT) {
             e.preventDefault();
             trackVariantSwitch(SITE_VARIANT, variant);
-            localStorage.setItem('worldmonitor-variant', variant);
-            window.location.reload();
+            void switchVariant(variant);
           }
         });
       });
@@ -400,8 +400,7 @@ export class EventHandlerManager implements AppModule {
         if (variant && variant !== SITE_VARIANT) {
           if (this.ctx.isDesktopApp || isLocalDev) {
             trackVariantSwitch(SITE_VARIANT, variant);
-            localStorage.setItem('worldmonitor-variant', variant);
-            window.location.reload();
+            void switchVariant(variant);
           } else {
             const hosts: Record<string, string> = {
               full: 'https://worldmonitor.app',

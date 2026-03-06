@@ -10,7 +10,6 @@
 import { Panel } from './Panel';
 import * as d3 from 'd3';
 import { type ProgressDataSet, type ProgressDataPoint } from '@/services/progress-data';
-import { getCSSColor } from '@/utils';
 import { replaceChildren } from '@/utils/dom-utils';
 import { escapeHtml } from '@/utils/sanitize';
 import { t } from '@/services/i18n';
@@ -67,16 +66,16 @@ export class ProgressChartsPanel extends Panel {
     Object.assign(this.tooltip.style, {
       position: 'absolute',
       pointerEvents: 'none',
-      background: getCSSColor('--bg'),
-      border: `1px solid ${getCSSColor('--border')}`,
+      background: 'var(--bg)',
+      border: '1px solid var(--border)',
       borderRadius: '6px',
       padding: '4px 8px',
       fontSize: '11px',
-      color: getCSSColor('--text'),
+      color: 'var(--text)',
       zIndex: '9999',
       display: 'none',
       whiteSpace: 'nowrap',
-      boxShadow: `0 2px 6px ${getCSSColor('--shadow-color')}`,
+      boxShadow: '0 2px 6px var(--shadow-color)',
     });
     this.content.style.position = 'relative';
     this.content.appendChild(this.tooltip);
@@ -279,7 +278,7 @@ export class ProgressChartsPanel extends Panel {
     const focusDot = g.append('circle')
       .attr('r', 3.5)
       .attr('fill', color)
-      .attr('stroke', '#fff')
+      .attr('stroke', 'var(--background)')
       .attr('stroke-width', 1.5)
       .attr('opacity', 0);
 

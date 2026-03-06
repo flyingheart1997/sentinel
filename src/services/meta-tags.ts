@@ -10,12 +10,16 @@ interface StoryMeta {
   type: 'ciianalysis' | 'crisisalert' | 'dailybrief' | 'marketfocus';
 }
 
-const variantMeta = VARIANT_META[SITE_VARIANT] ?? VARIANT_META.full;
-const BASE_URL = variantMeta.url.replace(/\/$/, '');
-const DEFAULT_IMAGE = `${BASE_URL}/favico/${SITE_VARIANT === 'full' ? '' : SITE_VARIANT + '/'}og-image.png`;
+function getVariantMeta() {
+  const meta = VARIANT_META[SITE_VARIANT] ?? VARIANT_META.full;
+  const baseUrl = meta.url.replace(/\/$/, '');
+  const defaultImage = `${baseUrl}/favico/${SITE_VARIANT === 'full' ? '' : SITE_VARIANT + '/'}og-image.png`;
+  return { meta, baseUrl, defaultImage };
+}
 
 export function updateMetaTagsForStory(meta: StoryMeta): void {
   const { countryCode, countryName, ciiScore, ciiLevel, trend, type } = meta;
+  const { meta: variantMeta, baseUrl: BASE_URL } = getVariantMeta();
 
   const title = `${countryName} Intelligence Brief | ${variantMeta.siteName}`;
   const description = generateDescription(ciiScore, ciiLevel, trend, type, countryName);
@@ -42,6 +46,7 @@ export function updateMetaTagsForStory(meta: StoryMeta): void {
 }
 
 export function resetMetaTags(): void {
+  const { meta: variantMeta, baseUrl: BASE_URL, defaultImage: DEFAULT_IMAGE } = getVariantMeta();
   document.title = variantMeta.title;
 
   setMetaTag('title', variantMeta.title);
@@ -88,6 +93,7 @@ function generateDescription(
     parts.push(typeDescriptions[type]);
   }
 
+  const { meta: variantMeta } = getVariantMeta();
   return `${variantMeta.siteName} ${parts.join('. ')}. Free, open-source geopolitical intelligence.`;
 }
 

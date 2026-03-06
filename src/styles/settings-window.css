@@ -1,17 +1,17 @@
 /* Settings window — VS Code-style sidebar + content layout */
 .settings-shell {
-  --settings-bg: var(--bg-secondary);
-  --settings-surface: var(--surface-hover);
-  --settings-surface-inset: var(--surface);
-  --settings-border: var(--overlay-medium);
-  --settings-border-strong: var(--overlay-heavy);
-  --settings-text: #e8eaed;
-  --settings-text-secondary: #9aa0a6;
-  --settings-accent: var(--semantic-info);
-  --settings-green: #34d399;
-  --settings-yellow: #fbbf24;
-  --settings-red: var(--semantic-critical);
-  --settings-blue: #60a5fa;
+  --settings-bg: var(--sidebar);
+  --settings-surface: var(--sidebar-accent);
+  --settings-surface-inset: var(--background);
+  --settings-border: var(--sidebar-border);
+  --settings-border-strong: var(--sidebar-ring);
+  --settings-text: var(--sidebar-foreground);
+  --settings-text-secondary: var(--muted-foreground);
+  --settings-accent: var(--sidebar-primary);
+  --settings-green: var(--status-live);
+  --settings-yellow: var(--status-cached);
+  --settings-red: var(--destructive);
+  --settings-blue: var(--semantic-info);
   --font-mono: 'SF Mono', 'Monaco', 'Cascadia Code', 'Fira Code', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
 
   height: 100vh;

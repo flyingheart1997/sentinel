@@ -105,15 +105,15 @@ export class CircuitBreaker<T> {
   /** Fire-and-forget write to persistent storage. */
   private writePersistentCache(data: T): void {
     import('../services/persistent-cache').then(({ setPersistentCache }) => {
-      setPersistentCache(this.persistKey, data).catch(() => {});
-    }).catch(() => {});
+      setPersistentCache(this.persistKey, data).catch(() => { });
+    }).catch(() => { });
   }
 
   /** Fire-and-forget delete from persistent storage. */
   private deletePersistentCache(): void {
     import('../services/persistent-cache').then(({ deletePersistentCache }) => {
-      deletePersistentCache(this.persistKey).catch(() => {});
-    }).catch(() => {});
+      deletePersistentCache(this.persistKey).catch(() => { });
+    }).catch(() => { });
   }
 
   isOnCooldown(): boolean {
@@ -288,4 +288,8 @@ export function removeCircuitBreaker(name: string): void {
 
 export function clearAllCircuitBreakers(): void {
   breakers.clear();
+}
+
+export function clearAllBreakerCaches(): void {
+  breakers.forEach(breaker => breaker.clearCache());
 }
