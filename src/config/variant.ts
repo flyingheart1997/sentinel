@@ -1,4 +1,4 @@
-export const SITE_VARIANT: string = (() => {
+export let SITE_VARIANT: string = (() => {
   if (typeof window === 'undefined') return import.meta.env.VITE_VARIANT || 'full';
 
   const isTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
@@ -21,3 +21,7 @@ export const SITE_VARIANT: string = (() => {
 
   return 'full';
 })();
+
+export function setSiteVariant(v: string) {
+  SITE_VARIANT = v;
+}

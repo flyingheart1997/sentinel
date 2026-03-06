@@ -3,7 +3,6 @@ import './styles/happy-theme.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import * as Sentry from '@sentry/browser';
 import { inject } from '@vercel/analytics';
-import { App } from './App';
 
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN?.trim();
 
@@ -13,7 +12,7 @@ Sentry.init({
   release: `worldmonitor@${__APP_VERSION__}`,
   environment: location.hostname === 'worldmonitor.app' ? 'production'
     : location.hostname.includes('vercel.app') ? 'preview'
-    : 'development',
+      : 'development',
   enabled: Boolean(sentryDsn) && !location.hostname.startsWith('localhost') && !('__TAURI_INTERNALS__' in window),
   sendDefaultPii: true,
   tracesSampleRate: 0.1,
@@ -210,13 +209,15 @@ import { installRuntimeFetchPatch, installWebApiRedirect } from '@/services/runt
 import { loadDesktopSecrets } from '@/services/runtime-config';
 import { applyStoredTheme } from '@/utils/theme-manager';
 import { SITE_VARIANT } from '@/config/variant';
-import { clearChunkReloadGuard, installChunkReloadGuard } from '@/bootstrap/chunk-reload';
+import { installChunkReloadGuard } from '@/bootstrap/chunk-reload';
 
 // Auto-reload on stale chunk 404s after deployment (Vite fires this for modulepreload failures).
 const chunkReloadStorageKey = installChunkReloadGuard(__APP_VERSION__);
 
 // Initialize Vercel Analytics
 inject();
+
+import { bootApp, setChunkReloadKey, updateVariantUI } from './app-orchestrator';
 
 // Initialize dynamic meta tags for sharing
 initMetaTags();
@@ -225,22 +226,13 @@ initMetaTags();
 installRuntimeFetchPatch();
 // In web production, route RPC calls through api.worldmonitor.app (Cloudflare edge).
 installWebApiRedirect();
-loadDesktopSecrets().catch(() => {});
+loadDesktopSecrets().catch(() => { });
 
 // Apply stored theme preference before app initialization (safety net for inline script)
 applyStoredTheme();
 
-// Set data-variant on <html> so CSS theme overrides activate
-if (SITE_VARIANT && SITE_VARIANT !== 'full') {
-  document.documentElement.dataset.variant = SITE_VARIANT;
-
-  // Swap favicons to variant-specific versions before browser finishes fetching defaults
-  document.querySelectorAll<HTMLLinkElement>('link[rel="icon"], link[rel="apple-touch-icon"]').forEach(link => {
-    link.href = link.href
-      .replace(/\/favico\/favicon/g, `/favico/${SITE_VARIANT}/favicon`)
-      .replace(/\/favico\/apple-touch-icon/g, `/favico/${SITE_VARIANT}/apple-touch-icon`);
-  });
-}
+// Set initial variant UI
+updateVariantUI(SITE_VARIANT);
 
 // Remove no-transition class after first paint to enable smooth theme transitions
 requestAnimationFrame(() => {
@@ -250,32 +242,11 @@ requestAnimationFrame(() => {
 // Clear stale settings-open flag (survives ungraceful shutdown)
 localStorage.removeItem('wm-settings-open');
 
-// Standalone windows: ?settings=1 = panel display settings, ?live-channels=1 = channel management
-// Both need i18n initialized so t() does not return undefined.
-const urlParams = new URL(location.href).searchParams;
-if (urlParams.get('settings') === '1') {
-  void Promise.all([import('./services/i18n'), import('./settings-window')]).then(
-    async ([i18n, m]) => {
-      await i18n.initI18n();
-      m.initSettingsWindow();
-    }
-  );
-} else if (urlParams.get('live-channels') === '1') {
-  void Promise.all([import('./services/i18n'), import('./live-channels-window')]).then(
-    async ([i18n, m]) => {
-      await i18n.initI18n();
-      m.initLiveChannelsWindow();
-    }
-  );
-} else {
-  const app = new App('app');
-  app
-    .init()
-    .then(() => {
-      clearChunkReloadGuard(chunkReloadStorageKey);
-    })
-    .catch(console.error);
-}
+// Pass chunk reload key to orchestrator
+setChunkReloadKey(chunkReloadStorageKey);
+
+// Initial boot
+void bootApp();
 
 // Debug helpers for geo-convergence testing (remove in production)
 (window as unknown as Record<string, unknown>).geoDebug = {
@@ -313,7 +284,7 @@ if (!('__TAURI_INTERNALS__' in window) && !('__TAURI__' in window) && 'serviceWo
       console.log('[PWA] Service worker registered');
       const swUpdateInterval = setInterval(async () => {
         if (!navigator.onLine) return;
-        try { await registration.update(); } catch {}
+        try { await registration.update(); } catch { }
       }, 60 * 60 * 1000);
       // Expose interval ID for cleanup/debugging
       (window as unknown as Record<string, unknown>).__swUpdateInterval = swUpdateInterval;

@@ -165,7 +165,7 @@ function persistConfig(config: TrendingConfig): void {
   if (!isStorageAvailable()) return;
   try {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-  } catch {}
+  } catch { }
 }
 
 function getBlockedTermSet(config: TrendingConfig): Set<string> {
@@ -598,7 +598,7 @@ async function enrichWithMLEntities(headlines: PendingMLEnrichmentHeadline[], in
 
     const spikes = checkForSpikes(now, config, blockedTerms);
     for (const spike of spikes) {
-      void handleSpike(spike, config).catch(() => {});
+      void handleSpike(spike, config).catch(() => { });
     }
   } catch (error) {
     console.debug('[TrendingKeywords] ML entity enrichment skipped:', error);
@@ -636,7 +636,7 @@ export function ingestHeadlines(headlines: TrendingHeadlineInput[]): void {
 
   const spikes = checkForSpikes(now, config, blockedTerms);
   for (const spike of spikes) {
-    void handleSpike(spike, config).catch(() => {});
+    void handleSpike(spike, config).catch(() => { });
   }
 
   void enrichWithMLEntities(pendingMLEnrichment, now);
@@ -645,6 +645,13 @@ export function ingestHeadlines(headlines: TrendingHeadlineInput[]): void {
 export function drainTrendingSignals(): CorrelationSignal[] {
   if (pendingSignals.length === 0) return [];
   return pendingSignals.splice(0, pendingSignals.length);
+}
+
+export function clearCaches(): void {
+  termFrequency.clear();
+  seenHeadlines.clear();
+  pendingSignals.length = 0;
+  activeSpikeTerms.clear();
 }
 
 export function getTrendingConfig(): TrendingConfig {

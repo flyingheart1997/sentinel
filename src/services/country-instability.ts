@@ -216,6 +216,8 @@ export function clearCountryData(): void {
   intelligenceSignalsLoaded = false;
 }
 
+export const clearCaches = clearCountryData;
+
 export function getCountryData(code: string): CountryData | undefined {
   return countryDataMap.get(code);
 }
@@ -931,15 +933,15 @@ export function calculateCII(): CountryScore[] {
     const hotspotBoost = getHotspotBoost(code);
     const newsUrgencyBoost = components.information >= 70 ? 5
       : components.information >= 50 ? 3
-      : 0;
+        : 0;
     const focalUrgency = focalUrgencies.get(code);
     const focalBoost = focalUrgency === 'critical' ? 8
       : focalUrgency === 'elevated' ? 4
-      : 0;
+        : 0;
 
     const displacementBoost = data.displacementOutflow >= 1_000_000 ? 8
       : data.displacementOutflow >= 100_000 ? 4
-      : 0;
+        : 0;
     const climateBoost = data.climateStress;
 
     const advisoryBoost = getAdvisoryBoost(data);
@@ -988,14 +990,14 @@ export function getCountryScore(code: string): number | null {
   const hotspotBoost = getHotspotBoost(code);
   const newsUrgencyBoost = components.information >= 70 ? 5
     : components.information >= 50 ? 3
-    : 0;
+      : 0;
   const focalUrgency = focalPointDetector.getCountryUrgency(code);
   const focalBoost = focalUrgency === 'critical' ? 8
     : focalUrgency === 'elevated' ? 4
-    : 0;
+      : 0;
   const displacementBoost = data.displacementOutflow >= 1_000_000 ? 8
     : data.displacementOutflow >= 100_000 ? 4
-    : 0;
+      : 0;
   const climateBoost = data.climateStress;
   const advisoryBoost = getAdvisoryBoost(data);
   const supplementalSignalBoost = getSupplementalSignalBoost(data);

@@ -136,3 +136,8 @@ export async function fetchCrypto(): Promise<CryptoData[]> {
 
   return lastSuccessfulCrypto;
 }
+
+export function clearCaches(): void {
+  lastSuccessfulByKey.clear();
+  lastSuccessfulCrypto = [];
+}

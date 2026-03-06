@@ -1,4 +1,5 @@
 import { rssProxyUrl } from '@/utils';
+import { SITE_VARIANT } from '@/config/variant';
 import { getPersistentCache, setPersistentCache } from './persistent-cache';
 import { dataFreshness } from './data-freshness';
 import { nameToCountryCode, matchCountryNamesInText } from './country-geometry';
@@ -110,7 +111,7 @@ function extractTargetCountry(title: string, feed: AdvisoryFeed): string | undef
   return matches[0] || undefined;
 }
 
-const CACHE_KEY = 'security-advisories';
+const getCacheKey = () => `security-advisories:${SITE_VARIANT}`;
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 let lastFetch = 0;
 let cachedResult: SecurityAdvisory[] | null = null;
@@ -222,7 +223,7 @@ export async function fetchSecurityAdvisories(
   // Cache
   cachedResult = deduped;
   lastFetch = now;
-  void setPersistentCache(CACHE_KEY, toSerializable(deduped));
+  void setPersistentCache(getCacheKey(), toSerializable(deduped));
 
   if (deduped.length > 0) {
     dataFreshness.recordUpdate('security_advisories', deduped.length);
@@ -231,8 +232,13 @@ export async function fetchSecurityAdvisories(
   return { ok: true, advisories: deduped };
 }
 
+export function clearCaches(): void {
+  cachedResult = null;
+  lastFetch = 0;
+}
+
 export async function loadCachedAdvisories(): Promise<SecurityAdvisory[] | null> {
-  const entry = await getPersistentCache<Array<Omit<SecurityAdvisory, 'pubDate'> & { pubDate: string }>>(CACHE_KEY);
+  const entry = await getPersistentCache<Array<Omit<SecurityAdvisory, 'pubDate'> & { pubDate: string }>>(getCacheKey());
   if (!entry?.data?.length) return null;
   return fromSerializable(entry.data);
 }

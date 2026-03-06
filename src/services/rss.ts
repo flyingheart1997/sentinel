@@ -41,7 +41,7 @@ function parseFeedScope(feedScope: string): { feedName: string; lang: string } {
 }
 
 function getPersistentFeedKey(feedScope: string): string {
-  return `feed:${feedScope}`;
+  return `feed:${SITE_VARIANT}:${feedScope}`;
 }
 
 async function readPersistentFeed(key: string): Promise<NewsItem[] | null> {
@@ -107,8 +107,13 @@ function recordFeedFailure(feedScope: string): void {
   feedFailures.set(feedScope, state);
 }
 
-function recordFeedSuccess(feedScope: string): void {
+export function recordFeedSuccess(feedScope: string): void {
   feedFailures.delete(feedScope);
+}
+
+export function clearCaches(): void {
+  feedCache.clear();
+  feedFailures.clear();
 }
 
 export function getFeedFailures(): Map<string, { count: number; cooldownUntil: number }> {
@@ -290,7 +295,7 @@ export async function fetchFeed(feed: Feed): Promise<NewsItem[]> {
         source: item.source,
         url: item.link,
         tags: item.locationName ? [item.locationName] : undefined,
-      }))).catch(() => {});
+      }))).catch(() => { });
     }
 
     const aiCandidates = parsed

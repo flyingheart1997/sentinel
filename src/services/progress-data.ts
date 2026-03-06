@@ -55,7 +55,7 @@ export const PROGRESS_INDICATORS: ProgressIndicator[] = [
     code: 'SP.DYN.LE00.IN',
     label: 'Life Expectancy',
     unit: 'years',
-    color: '#6B8F5E',   // sage green
+    color: 'var(--chart-1)',
     years: 65,
     invertTrend: false,
   },
@@ -64,7 +64,7 @@ export const PROGRESS_INDICATORS: ProgressIndicator[] = [
     code: 'SE.ADT.LITR.ZS',
     label: 'Literacy Rate',
     unit: '%',
-    color: '#7BA5C4',   // soft blue
+    color: 'var(--chart-2)',
     years: 55,
     invertTrend: false,
   },
@@ -73,7 +73,7 @@ export const PROGRESS_INDICATORS: ProgressIndicator[] = [
     code: 'SH.DYN.MORT',
     label: 'Child Mortality',
     unit: 'per 1,000',
-    color: '#C4A35A',   // warm gold
+    color: 'var(--chart-3)',
     years: 65,
     invertTrend: true,
   },
@@ -82,7 +82,7 @@ export const PROGRESS_INDICATORS: ProgressIndicator[] = [
     code: 'SI.POV.DDAY',
     label: 'Extreme Poverty',
     unit: '%',
-    color: '#C48B9F',   // muted rose
+    color: 'var(--chart-4)',
     years: 45,
     invertTrend: true,
   },

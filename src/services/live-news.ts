@@ -34,3 +34,7 @@ export async function fetchLiveVideoId(channelHandle: string): Promise<string | 
   const info = await fetchLiveVideoInfo(channelHandle);
   return info.videoId;
 }
+
+export function clearCaches(): void {
+  liveVideoCache.clear();
+}

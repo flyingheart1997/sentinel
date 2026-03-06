@@ -2,9 +2,9 @@ import type { Monitor, PanelConfig, MapLayers } from '@/types';
 import type { AppContext } from '@/app/app-context';
 import {
   REFRESH_INTERVALS,
-  DEFAULT_PANELS,
-  DEFAULT_MAP_LAYERS,
-  MOBILE_DEFAULT_MAP_LAYERS,
+  getDefaultPanels,
+  getDefaultMapLayers,
+  getMobileDefaultMapLayers,
   STORAGE_KEYS,
   SITE_VARIANT,
 } from '@/config';
@@ -72,7 +72,7 @@ export class App {
     const monitors = loadFromStorage<Monitor[]>(STORAGE_KEYS.monitors, []);
 
     // Use mobile-specific defaults on first load (no saved layers)
-    const defaultLayers = isMobile ? MOBILE_DEFAULT_MAP_LAYERS : DEFAULT_MAP_LAYERS;
+    const defaultLayers = isMobile ? getMobileDefaultMapLayers() : getDefaultMapLayers();
 
     let mapLayers: MapLayers;
     let panelSettings: Record<string, PanelConfig>;
@@ -90,7 +90,7 @@ export class App {
       localStorage.removeItem(PANEL_ORDER_KEY);
       localStorage.removeItem(PANEL_SPANS_KEY);
       mapLayers = { ...defaultLayers };
-      panelSettings = { ...DEFAULT_PANELS };
+      panelSettings = { ...getDefaultPanels() };
     } else {
       mapLayers = loadFromStorage<MapLayers>(STORAGE_KEYS.mapLayers, defaultLayers);
       // Happy variant: force non-happy layers off even if localStorage has stale true values
@@ -100,10 +100,10 @@ export class App {
       }
       panelSettings = loadFromStorage<Record<string, PanelConfig>>(
         STORAGE_KEYS.panels,
-        DEFAULT_PANELS
+        getDefaultPanels()
       );
       // Merge in any new panels that didn't exist when settings were saved
-      for (const [key, config] of Object.entries(DEFAULT_PANELS)) {
+      for (const [key, config] of Object.entries(getDefaultPanels())) {
         if (!(key in panelSettings)) {
           panelSettings[key] = { ...config };
         }

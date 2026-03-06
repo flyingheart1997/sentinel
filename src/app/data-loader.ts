@@ -187,6 +187,9 @@ export class DataLoaderManager implements AppModule {
   private readonly perFeedFallbackIntelFeedLimit = 6;
   private readonly perFeedFallbackBatchSize = 2;
   private lastGoodDigest: ListFeedDigestResponse | null = null;
+  private get digestCacheKey(): string {
+    return `digest:last-good:${SITE_VARIANT}`;
+  }
 
   constructor(ctx: AppContext, callbacks: DataLoaderCallbacks) {
     this.ctx = ctx;
@@ -207,6 +210,7 @@ export class DataLoaderManager implements AppModule {
       window.removeEventListener('wm-market-watchlist-changed', this.boundMarketWatchlistHandler as EventListener);
       this.boundMarketWatchlistHandler = null;
     }
+    this.lastGoodDigest = null;
   }
 
   private refreshCiiAndBrief(forceLocal = false): void {
@@ -252,12 +256,12 @@ export class DataLoaderManager implements AppModule {
   }
 
   private persistDigest(data: ListFeedDigestResponse): void {
-    setPersistentCache('digest:last-good', data).catch(() => { });
+    setPersistentCache(this.digestCacheKey, data).catch(() => { });
   }
 
   private async loadPersistedDigest(): Promise<ListFeedDigestResponse | null> {
     try {
-      const envelope = await getPersistentCache<ListFeedDigestResponse>('digest:last-good');
+      const envelope = await getPersistentCache<ListFeedDigestResponse>(this.digestCacheKey);
       if (!envelope) return null;
       if (Date.now() - envelope.updatedAt > this.persistedDigestMaxAgeMs) return null;
       this.lastGoodDigest = envelope.data;
