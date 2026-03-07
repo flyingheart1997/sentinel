@@ -3,7 +3,7 @@
  * Loaded when the app is opened with ?settings=1 (e.g. from the main window's Settings button).
  */
 import type { PanelConfig } from '@/types';
-import { DEFAULT_PANELS, STORAGE_KEYS } from '@/config';
+import { getDefaultPanels, STORAGE_KEYS } from '@/config';
 import { loadFromStorage, saveToStorage } from '@/utils';
 import { t } from '@/services/i18n';
 import { escapeHtml } from '@/utils/sanitize';
@@ -28,7 +28,7 @@ export function initSettingsWindow(): void {
 
   let panelSettings = loadFromStorage<Record<string, PanelConfig>>(
     STORAGE_KEYS.panels,
-    DEFAULT_PANELS
+    getDefaultPanels()
   );
 
   const isDesktopApp = isDesktopRuntime();

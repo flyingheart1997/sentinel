@@ -1,4 +1,4 @@
-import { getApiBaseUrl, isDesktopRuntime } from './runtime';
+import { getApiBaseUrl, isDesktopRuntime } from './runtime-env';
 import { invokeTauri } from './tauri-bridge';
 
 export type RuntimeSecretKey =

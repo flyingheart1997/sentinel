@@ -1,3 +1,4 @@
+export { clearCaches } from './rss';
 export * from './rss';
 export * from './trending-keywords';
 export * from './market';

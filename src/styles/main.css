@@ -348,12 +348,14 @@ canvas,
   border-bottom: 1px solid var(--border);
   height: 40px;
   flex-shrink: 0;
+  gap: 24px
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 /* Variant Switcher */
@@ -368,7 +370,7 @@ canvas,
   margin-right: 6px;
 }
 
-.variant-option {
+.variant-option{
   display: flex;
   align-items: center;
   gap: 4px;
@@ -383,7 +385,7 @@ canvas,
   cursor: pointer;
 }
 
-.variant-option .variant-icon {
+.variant-option .variant-icon{
   font-size: 11px;
   filter: grayscale(80%);
   transition: filter 0.25s ease;
@@ -398,7 +400,7 @@ canvas,
 
 .variant-option:hover .variant-label,
 .variant-option.active .variant-label {
-  max-width: 50px;
+  max-width: 80px;
   opacity: 1;
 }
 
@@ -438,7 +440,7 @@ canvas,
 }
 
 .variant-switcher:hover .variant-option .variant-label {
-  max-width: 50px;
+  max-width: 80px;
   opacity: 1;
 }
 
@@ -718,6 +720,7 @@ canvas,
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn {
@@ -3579,7 +3582,7 @@ body.live-news-fullscreen-active .panels-grid > *:not(.live-news-fullscreen) {
 .signal-dismiss-btn {
   background: var(--accent);
   border: none;
-  color: var(--bg);
+  color: var(--text);
   padding: 8px 16px;
   font-size: 11px;
   cursor: pointer;
@@ -6029,7 +6032,7 @@ a.prediction-link:hover {
 .panel-toggle-item.active .panel-toggle-checkbox {
   background: var(--purple);
   border-color: var(--purple);
-  color: var(--surface);
+  color: white;
 }
 
 .panel-toggle-label {
@@ -6119,7 +6122,7 @@ a.prediction-link:hover {
 .source-toggle-item.active .source-toggle-checkbox {
   background: var(--purple);
   border-color: var(--purple);
-  color: var(--surface);
+  color: white;
 }
 
 .source-toggle-label {
@@ -9739,12 +9742,12 @@ a.prediction-link:hover {
 
 .pizzint-location-status.spike {
   background: var(--defcon-1);
-  color: var(--accent);
+  color: var(--text);
 }
 
 .pizzint-location-status.high {
   background: var(--defcon-2);
-  color: var(--accent);
+  color: var(--text);
 }
 
 .pizzint-location-status.elevated {
@@ -9754,7 +9757,7 @@ a.prediction-link:hover {
 
 .pizzint-location-status.nominal {
   background: var(--defcon-4);
-  color: var(--accent);
+  color: var(--text);
 }
 
 .pizzint-location-status.quiet {
@@ -13394,7 +13397,7 @@ a.prediction-link:hover {
   left: 10px;
   z-index: 100;
   background: var(--surface);
-  padding: 8px 12px;
+  padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
 }
@@ -13423,7 +13426,7 @@ a.prediction-link:hover {
 .deckgl-time-slider .time-btn.active {
   background: var(--purple);
   border-color: var(--purple);
-  color: var(--bg);
+  color: white;
   font-weight: bold;
 }
 
@@ -13432,7 +13435,7 @@ a.prediction-link:hover {
   position: absolute;
   width: 180px;
   top: 10px;
-  left: 250px;
+  left: 245px;
   z-index: 100;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -13450,7 +13453,7 @@ a.prediction-link:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border);
   font-size: 10px;
   font-weight: bold;
@@ -13545,7 +13548,7 @@ a.prediction-link:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: var(--bg);
+  color: white;
   font-size: 10px;
   font-weight: bold;
   line-height: 1;
@@ -14626,7 +14629,7 @@ a.prediction-link:hover {
 .ai-flow-slider {
   position: absolute;
   inset: 0;
-  background: var(--overlay-heavy);
+  background: var(--border);
   border-radius: 18px;
   transition: background 0.2s;
 }

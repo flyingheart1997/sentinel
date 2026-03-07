@@ -159,15 +159,26 @@ export class PanelLayoutManager implements AppModule {
               <span class="variant-icon">📈</span>
               <span class="variant-label">${t('header.finance')}</span>
             </a>
-            ${SITE_VARIANT === 'happy' ? `<span class="variant-divider"></span>
-            <a href="${vHref('happy', 'https://happy.worldmonitor.app')}"
-               class="variant-option active"
-               data-variant="happy"
-               ${vTarget('happy')}
-               title="Good News ${t('common.currentVariant')}">
-              <span class="variant-icon">☀️</span>
-              <span class="variant-label">Good News</span>
-            </a>` : ''}`;
+            <span class="variant-divider"></span>
+            <a
+               id="satSimBtn"
+               class="variant-option sim-variant-btn"
+               data-variant="simulation"
+               title="Satellite Simulation Dashboard">
+              <span class="variant-icon">🛰️</span>
+              <span class="variant-label">SIMULATION</span>
+            </a>
+            ${SITE_VARIANT === 'happy' ? `
+              <span class="variant-divider"></span>
+              <a href="${vHref('happy', 'https://happy.worldmonitor.app')}"
+                 class="variant-option active"
+                 data-variant="happy"
+                 ${vTarget('happy')}
+                 title="Good News ${t('common.currentVariant')}">
+                <span class="variant-icon">☀️</span>
+                <span class="variant-label">Good News</span>
+              </a>` : ''}
+          `;
       })()}</div>
           <span class="logo">SENTINEL</span><span class="logo-mobile">Sentinel</span><span class="version">v${__APP_VERSION__}</span>${BETA_MODE ? '<span class="beta-badge">BETA</span>' : ''}
           <a href="https://x.com/koushikm_mondal" target="_blank" rel="noopener" class="credit-link">
@@ -235,6 +246,7 @@ export class PanelLayoutManager implements AppModule {
           { key: 'full', icon: '🌍', label: t('header.world') },
           { key: 'tech', icon: '💻', label: t('header.tech') },
           { key: 'finance', icon: '📈', label: t('header.finance') },
+          { key: 'simulation', icon: '🛰️', label: t('header.simulation') },
         ];
         if (SITE_VARIANT === 'happy') variants.push({ key: 'happy', icon: '☀️', label: 'Good News' });
         return variants.map(v =>

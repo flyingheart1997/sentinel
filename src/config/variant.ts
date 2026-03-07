@@ -4,7 +4,7 @@ export let SITE_VARIANT: string = (() => {
   const isTauri = '__TAURI_INTERNALS__' in window || '__TAURI__' in window;
   if (isTauri) {
     const stored = localStorage.getItem('worldmonitor-variant');
-    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy') return stored;
+    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy' || stored === 'simulation') return stored;
     return import.meta.env.VITE_VARIANT || 'full';
   }
 
@@ -15,7 +15,7 @@ export let SITE_VARIANT: string = (() => {
 
   if (h === 'localhost' || h === '127.0.0.1') {
     const stored = localStorage.getItem('worldmonitor-variant');
-    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy') return stored;
+    if (stored === 'tech' || stored === 'full' || stored === 'finance' || stored === 'happy' || stored === 'simulation') return stored;
     return import.meta.env.VITE_VARIANT || 'full';
   }
 

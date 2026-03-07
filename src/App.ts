@@ -406,6 +406,8 @@ export class App {
       await this.dataLoader.hydrateHappyPanelsFromCache();
     }
 
+    // Simulation mode handled via user interaction, not auto-trigger
+
     // Phase 2: Shared UI components
     this.state.signalModal = new SignalModal();
     this.state.signalModal.setLocationClickHandler((lat, lon) => {

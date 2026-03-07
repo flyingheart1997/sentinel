@@ -243,6 +243,12 @@ export class EventHandlerManager implements AppModule {
     document.getElementById('searchBtn')?.addEventListener('click', openSearch);
     document.getElementById('mobileSearchBtn')?.addEventListener('click', openSearch);
     document.getElementById('searchMobileFab')?.addEventListener('click', openSearch);
+    // Simulation button toggles the overlay directly instead of switching variants
+    document.querySelector('.sim-variant-btn')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const { toggleSatelliteSimulation } = await import('@/components/simulation');
+      void toggleSatelliteSimulation();
+    });
 
     document.getElementById('copyLinkBtn')?.addEventListener('click', async () => {
       const shareUrl = this.getShareUrl();
@@ -290,6 +296,7 @@ export class EventHandlerManager implements AppModule {
           const variant = link.dataset.variant;
           if (variant && variant !== SITE_VARIANT) {
             e.preventDefault();
+            if (variant === 'simulation') return; // Handled completely by .sim-variant-btn listener
             trackVariantSwitch(SITE_VARIANT, variant);
             void switchVariant(variant);
           }
@@ -398,6 +405,12 @@ export class EventHandlerManager implements AppModule {
       btn.addEventListener('click', () => {
         const variant = btn.dataset.variant;
         if (variant && variant !== SITE_VARIANT) {
+          if (variant === 'simulation') {
+            this.closeMobileMenu();
+            // Simulation is toggled via .sim-variant-btn listener, so we just click that
+            document.querySelector<HTMLElement>('.sim-variant-btn')?.click();
+            return;
+          }
           if (this.ctx.isDesktopApp || isLocalDev) {
             trackVariantSwitch(SITE_VARIANT, variant);
             void switchVariant(variant);
