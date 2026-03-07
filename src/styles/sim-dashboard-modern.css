@@ -1,0 +1,814 @@
+/* ============================================================
+   Modern Orbital Simulation Dashboard Theme
+   Based on "EYES ON EARTH" reference UI
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Aldrich&display=swap');
+
+:root {
+  --sim-bg: transparent; 
+  --sim-panel-bg: transparent;
+  --sim-border: #0a2540;
+  --sim-border-glow: rgba(0, 255, 255, 0.3);
+  
+  --sim-text-primary: #e0f2fe;
+  --sim-text-secondary: #7dd3fc;
+  --sim-text-muted: #38bdf8;
+  --sim-text-dim: #0284c7;
+
+  --sim-accent-cyan: #00ffff;
+  --sim-accent-blue: #3b82f6;
+  --sim-accent-red: #ef4444;
+  --sim-accent-orange: #f97316;
+  --sim-accent-green: #22c55e;
+  --sim-accent-yellow: #eab308;
+
+  --font-sim-header: 'Aldrich', sans-serif;
+  --font-sim-mono: 'Share Tech Mono', monospace;
+}
+
+/* Base Overlay container */
+.sim-ui-modern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Let clicks pass through to 3D scene by default */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: var(--font-sim-mono);
+  color: var(--sim-text-primary);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.sim-ui-modern > * {
+  /* Only pointer events on actual UI elements, not the wrapper */
+  pointer-events: auto;
+}
+
+/* Scrollbars: Hide completely by default, show on hover */
+.sim-catalog-list::-webkit-scrollbar, .sim-data-layers::-webkit-scrollbar, .sim-intel-content::-webkit-scrollbar, .sim-alert-list::-webkit-scrollbar, .sim-telemetry-list::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+.sim-catalog-list::-webkit-scrollbar-track, .sim-data-layers::-webkit-scrollbar-track, .sim-intel-content::-webkit-scrollbar-track, .sim-alert-list::-webkit-scrollbar-track, .sim-telemetry-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sim-catalog-list::-webkit-scrollbar-thumb, .sim-data-layers::-webkit-scrollbar-thumb, .sim-intel-content::-webkit-scrollbar-thumb, .sim-alert-list::-webkit-scrollbar-thumb, .sim-telemetry-list::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+.sim-catalog-list:hover::-webkit-scrollbar-thumb, .sim-data-layers:hover::-webkit-scrollbar-thumb, .sim-intel-content:hover::-webkit-scrollbar-thumb, .sim-alert-list:hover::-webkit-scrollbar-thumb, .sim-telemetry-list:hover::-webkit-scrollbar-thumb {
+  background: var(--sim-text-dim);
+}
+
+/* Titles and subheaders */
+.sim-title-glow {
+  font-family: var(--font-sim-header);
+  color: var(--sim-accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--sim-border-glow);
+}
+
+/* ─────────────────────────────────────────────────────────
+   TOP BAR
+   ───────────────────────────────────────────────────────── */
+.sim-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px 10px 30px;
+  background: linear-gradient(to bottom, rgba(0, 5, 15, 0.95), transparent);
+}
+
+.sim-brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.sim-brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, rgba(0, 255, 255, 0) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sim-brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+}
+.sim-brand-fallback {
+  position: absolute;
+  z-index: 1;
+}
+
+.sim-brand-text h1 {
+  font-family: var(--font-sim-header);
+  font-size: 24px;
+  margin: 0;
+  color: #fff;
+  letter-spacing: 4px;
+}
+.sim-brand-text p {
+  font-size: 11px;
+  margin: 0;
+  color: var(--sim-text-dim);
+  letter-spacing: 3px;
+}
+
+.sim-global-stats {
+  display: flex;
+  gap: 40px;
+}
+.sim-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sim-stat-val {
+  font-family: var(--font-sim-header);
+  font-size: 22px;
+  color: var(--sim-accent-cyan);
+  font-weight: bold;
+}
+.sim-stat-val.orange { color: var(--sim-accent-orange); }
+.sim-stat-val.green { color: var(--sim-accent-green); }
+.sim-stat-lbl {
+  font-size: 10px;
+  color: var(--sim-text-muted);
+  letter-spacing: 1.5px;
+}
+
+
+
+.sim-controls-top {
+  display: flex;
+  gap: 15px;
+}
+.sim-btn-outline {
+  background: transparent;
+  border: 1px solid var(--sim-text-dim);
+  color: var(--sim-text-secondary);
+  padding: 8px 24px;
+  font-family: var(--font-sim-header);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.sim-btn-outline:hover {
+  border-color: var(--sim-accent-cyan);
+  color: var(--sim-accent-cyan);
+  box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2);
+}
+.sim-btn-outline.active {
+  background: rgba(0, 255, 255, 0.15);
+  border-color: var(--sim-accent-cyan);
+  color: var(--sim-accent-cyan);
+}
+
+/* Modern Tilted Header Controls */
+.sim-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-right: 20px;
+}
+
+.sim-modern-btn-wrap {
+  position: relative;
+  height: 38px;
+  background: rgba(0, 20, 40, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  transform: skewX(-15deg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 4px; /* Padding for the inner un-skewed content */
+  /* Corner notch effect */
+  clip-path: polygon(
+    0% 4px, 4px 0%, 
+    100% 0%, 100% calc(100% - 4px), 
+    calc(100% - 4px) 100%, 
+    0% 100%
+  );
+}
+
+.sim-modern-btn-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.sim-modern-btn-wrap:hover {
+  background: rgba(0, 255, 255, 0.15);
+  border-color: var(--sim-accent-cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  transform: skewX(-15deg) translateY(-1px);
+}
+
+/* Exit specific theme */
+.sim-modern-btn-wrap.exit-theme {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.sim-modern-btn-wrap.exit-theme:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--sim-accent-red);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.sim-modern-content {
+  transform: skewX(15deg); /* Counter-skew */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+}
+
+.sim-modern-select {
+  text-align: center;
+  background: transparent;
+  color: var(--sim-text-primary);
+  border: none;
+  font-family: var(--font-sim-header);
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.sim-modern-select option {
+  background: #000c18;
+  color: #fff;
+}
+
+.sim-modern-btn {
+  background: transparent;
+  color: var(--sim-text-primary);
+  border: none;
+  font-family: var(--font-sim-header);
+  font-size: 11px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  outline: none;
+  text-transform: uppercase;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.sim-modern-btn-wrap.exit-theme .sim-modern-btn {
+  color: #fca5a5;
+}
+.sim-modern-btn-wrap.exit-theme:hover .sim-modern-btn {
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────
+   MIDDLE PANELS (LEFT & RIGHT)
+   ───────────────────────────────────────────────────────── */
+.sim-main-area {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px; /* Reduced right padding to account for scrollbar space if needed */
+  overflow: hidden;
+  pointer-events: none; /* Crucial: clicks in empty space must pass through to map */
+}
+
+.sim-side-panel {
+  width: 330px;
+  display: flex;
+  flex-direction: column;
+  height: auto; /* Take full available height */
+  max-height: 100%;
+  pointer-events: auto;
+  padding: 10px 15px; 
+  position: relative;
+  z-index: 1;
+}
+
+/* Bracket Styling (4-corner modern box) */
+.left-panel, .right-panel { 
+  background: rgba(0, 10, 20, 0.6); 
+  border: 1px solid rgba(0, 255, 255, 0.1); 
+  box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.05);
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+.sim-logo-spin {
+  animation: logo-spin 12s linear infinite;
+}
+
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.left-panel::before, .left-panel::after,
+.right-panel::before, .right-panel::after {
+  content: ''; position: absolute; width: 15px; height: 15px;
+  border-color: var(--sim-accent-cyan); border-style: solid; border-width: 0;
+  pointer-events: none;
+}
+
+/* Left Panel Corners (Top-Left, Bottom-Right) */
+.left-panel::before { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.left-panel::after { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* Right Panel Corners (Top-Right, Bottom-Left) */
+.right-panel::before { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.right-panel::after { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+
+/* Tooltip */
+.sat-intel-tooltip-modern {
+  position: absolute; 
+  padding: 10px 14px; 
+  pointer-events: none; z-index: 1000;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 10, 20, 0.8);
+  border: none;
+  
+  /* Draw 4 corner borders using gradients */
+  background-image: 
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan)),
+    linear-gradient(var(--sim-accent-cyan), var(--sim-accent-cyan));
+  background-repeat: no-repeat;
+  background-size: 
+    10px 2px, 2px 10px, /* Top Left */
+    10px 2px, 2px 10px, /* Top Right */
+    10px 2px, 2px 10px, /* Bottom Left */
+    10px 2px, 2px 10px; /* Bottom Right */
+  background-position: 
+    top left, top left,
+    top right, top right,
+    bottom left, bottom left,
+    bottom right, bottom right;
+}
+.tt-title {
+  font-family: var(--font-sim-header); color: #fff; font-size: 12px;
+  letter-spacing: 1px; margin-bottom: 4px;
+}
+.tt-sub {
+  color: var(--sim-text-dim); font-size: 9px; letter-spacing: 1px;
+}
+
+/* Intel Panel */
+/* The intel panel already resides INSIDE the side-panel which now has the background box. 
+   We will make the intel panel integrate smoothly without double-boxing heavily. */
+.sim-intel-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+  height: 100%;
+}
+/* Removed old intel box styling as the parent side-panel has it now */
+
+/* Panel Sections */
+.sim-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Instead of shrinking, let the catalog and data layers share the height. 
+     We'll set an absolute constraint on flex so they don't grow infinitely. */
+  max-height: 50%; 
+}
+.sim-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+.sim-panel-title {
+  font-family: var(--font-sim-header);
+  font-size: 14px;
+  color: var(--sim-accent-cyan);
+  letter-spacing: 2px;
+}
+.sim-panel-badge {
+  background: rgba(0, 20, 40, 0.6);
+  border: 1px solid var(--sim-text-dim);
+  color: var(--sim-text-secondary);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+
+/* Search input */
+.sim-search-input {
+  background: rgba(0, 20, 40, 0.5);
+  border: 1px solid var(--sim-border);
+  color: var(--sim-text-primary);
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-family: var(--font-sim-mono);
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+}
+.sim-search-input::placeholder { color: var(--sim-text-dim); }
+.sim-search-input:focus { border-color: var(--sim-accent-cyan); }
+
+/* Catalog List */
+.sim-catalog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1; /* Allow the list itself to take up the remaining portion of the section */
+}
+.sim-catalog-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+}
+.sim-catalog-item:hover, .sim-catalog-item.active {
+  background: rgba(0, 255, 255, 0.1);
+  border-left-color: var(--sim-accent-cyan);
+}
+.sim-cat-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.sim-cat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px currentColor;
+}
+.sim-cat-details h4 {
+  margin: 0 0 2px 0;
+  font-size: 12px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.sim-cat-details p {
+  margin: 0;
+  font-size: 10px;
+  color: var(--sim-text-dim);
+}
+.sim-cat-alt {
+  font-size: 11px;
+  color: var(--sim-text-secondary);
+}
+
+/* Toggles (Data Layers) */
+.sim-data-layers { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+  overflow-y: auto; 
+  padding-right: 5px; 
+  flex: 1;
+}
+.sim-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sim-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--sim-text-secondary);
+  letter-spacing: 1px;
+}
+.sim-toggle-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Custom Checkbox/Toggle Switch */
+.sim-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+.sim-switch input { opacity: 0; width: 0; height: 0; }
+.sim-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(2, 132, 199, 0.2);
+  border: 1px solid var(--sim-text-dim);
+  border-radius: 12px;
+  transition: .4s;
+}
+.sim-slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--sim-text-secondary);
+  border-radius: 50%;
+  transition: .4s;
+}
+input:checked + .sim-slider {
+  background-color: rgba(0, 255, 255, 0.15);
+  border-color: var(--sim-accent-cyan);
+}
+input:checked + .sim-slider:before {
+  transform: translateX(20px);
+  background-color: var(--sim-accent-cyan);
+  box-shadow: 0 0 8px var(--sim-accent-cyan);
+}
+
+/* Right List: Telemetry */
+.sim-telemetry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Fix the spacing */
+  overflow-y: auto;
+  padding-right: 5px;
+  flex: 1;
+}
+.sim-telemetry-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sim-tel-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--sim-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.sim-tel-val {
+  font-size: 12px;
+  color: var(--sim-accent-cyan);
+  font-weight: bold;
+}
+.sim-tel-val.orange { color: var(--sim-accent-orange); }
+.sim-tel-val.red { color: var(--sim-accent-red); }
+.sim-tel-val.green { color: var(--sim-accent-green); }
+.sim-tel-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+}
+.sim-tel-fill {
+  height: 100%;
+  background: var(--sim-accent-cyan);
+  box-shadow: 0 0 8px var(--sim-accent-cyan);
+}
+.sim-tel-fill.orange { background: var(--sim-accent-orange); box-shadow: 0 0 8px var(--sim-accent-orange); }
+.sim-tel-fill.red { background: var(--sim-accent-red); box-shadow: 0 0 8px var(--sim-accent-red); }
+.sim-tel-fill.green { background: var(--sim-accent-green); box-shadow: 0 0 8px var(--sim-accent-green); }
+
+/* Mission Alerts */
+.sim-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 5px;
+  flex: 1;
+}
+.sim-alert-row {
+  display: flex;
+  gap: 15px;
+  font-size: 11px;
+}
+.sim-alert-icon { font-size: 14px; margin-top: 2px; }
+.sim-alert-content p {
+  margin: 0 0 4px 0;
+  color: var(--sim-text-secondary);
+  line-height: 1.3;
+}
+.sim-alert-content span {
+  font-size: 9px;
+  color: var(--sim-text-dim);
+  letter-spacing: 1px;
+}
+
+/* Ground Stations */
+.sim-gs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 255, 255, 0.2);
+}
+.sim-gs-name {
+  font-size: 11px;
+  color: var(--sim-text-secondary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.sim-gs-status {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.sim-gs-status.nominal { color: var(--sim-accent-green); }
+.sim-gs-status.standby { color: var(--sim-accent-orange); }
+.sim-gs-status.offline { color: var(--sim-accent-red); }
+
+/* Intel Panel Rules */
+.sim-intel-panel { display: flex; flex-direction: column; gap: 20px; height: 100%; }
+.intel-panel-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;}
+.intel-panel-header h2 { font-family: var(--font-sim-header); font-size: 18px; color: #fff; margin: 0; letter-spacing: 2px;}
+.intel-sub-title { font-size: 10px; color: var(--sim-accent-cyan); letter-spacing: 2px; }
+.stat-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+.stat-row { display: flex; justify-content: space-between; font-size: 10px; border-bottom: 1px dotted rgba(0, 255, 255, 0.1); padding-bottom: 4px; }
+.stat-lbl { color: var(--sim-text-dim); letter-spacing: 1px; }
+.stat-val { color: var(--sim-text-secondary); text-align: right;}
+.stat-val.white { color: #fff; }
+.stat-val.green { color: var(--sim-accent-green); }
+
+/* ─────────────────────────────────────────────────────────
+   BOTTOM BAR Coordinates & Controller
+   ───────────────────────────────────────────────────────── */
+.sim-bottom-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 15px 30px 20px 30px;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  pointer-events: none; /* Passes click to window/map */
+  gap: 10px;
+  z-index: 0;
+  background: linear-gradient(to top, rgba(0, 5, 15, 0.95), transparent);
+}
+
+.sim-speed-controller {
+  position: relative;
+  width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+
+.sim-speed-mid-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px; /* Pull date and time closer to buttons */
+  width: 100%;
+  font-family: var(--font-sim-mono);
+  font-size: 14px;
+  color: #ccc;
+  letter-spacing: 1.5px;
+}
+
+.sim-live-button {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sim-mono);
+  font-size: 18px;
+  font-weight: 700;
+  text-shadow: 0 0 8px currentColor;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.sim-live-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sim-blink-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sim-accent-green);
+  box-shadow: 0 0 8px var(--sim-accent-green);
+  animation: sim-blink 1.5s infinite;
+  display: inline-block;
+}
+
+@keyframes sim-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.sim-speed-track-container {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base custom slider styling */
+.sim-speed-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  outline: none;
+  position: absolute;
+  z-index: 2;
+  top: 6px;
+}
+
+.sim-speed-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+.sim-speed-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background: var(--sim-accent-green);
+  box-shadow: 
+    0 0 15px var(--sim-accent-green), 
+    inset 0 0 8px rgba(0,0,0,0.8);
+  border: 4px solid rgba(30, 40, 45, 0.9);
+  cursor: pointer;
+  margin-top: -14px; /* center thumb on track */
+  transition: transform 0.1s;
+}
+
+.sim-speed-slider::-moz-range-thumb {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background: var(--sim-accent-green);
+  box-shadow: 
+    0 0 15px var(--sim-accent-green), 
+    inset 0 0 8px rgba(0,0,0,0.8);
+  border: 4px solid rgba(30, 40, 45, 0.9);
+  cursor: pointer;
+}
+
+.sim-coordinates {
+  display: flex;
+  gap: 25px;
+  font-size: 12px;
+  color: var(--sim-text-dim);
+  letter-spacing: 2px;
+  background: transparent;
+  pointer-events: auto; /* Re-enable for the coord string */
+}
+.sim-coord-lbl {
+  color: var(--sim-text-dim);
+  margin-right: 5px;
+}
+.sim-coord-val {
+  color: var(--sim-accent-cyan);
+}

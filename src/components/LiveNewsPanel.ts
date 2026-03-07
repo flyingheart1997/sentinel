@@ -1,6 +1,7 @@
 import { Panel } from './Panel';
 import { fetchLiveVideoInfo } from '@/services/live-news';
 import { isDesktopRuntime, getRemoteApiBaseUrl, getApiBaseUrl, getLocalApiPort } from '@/services/runtime';
+import { tryInvokeTauri } from '@/services/tauri-bridge';
 import { t } from '../services/i18n';
 import { loadFromStorage, saveToStorage } from '@/utils';
 import { IDLE_PAUSE_MS, STORAGE_KEYS, SITE_VARIANT } from '@/config';
@@ -1405,7 +1406,6 @@ export class LiveNewsPanel extends Panel {
     const youtubeLoginUrl = 'https://accounts.google.com/ServiceLogin?service=youtube&continue=https://www.youtube.com/';
     if (isDesktopRuntime()) {
       try {
-        const { tryInvokeTauri } = await import('@/services/tauri-bridge');
         await tryInvokeTauri('open_youtube_login');
       } catch {
         window.open(youtubeLoginUrl, '_blank');

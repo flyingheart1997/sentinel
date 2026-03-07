@@ -209,9 +209,12 @@ import { installRuntimeFetchPatch, installWebApiRedirect } from '@/services/runt
 import { loadDesktopSecrets } from '@/services/runtime-config';
 import { applyStoredTheme } from '@/utils/theme-manager';
 import { SITE_VARIANT } from '@/config/variant';
+import { initClient } from './init-client';
 import { installChunkReloadGuard } from '@/bootstrap/chunk-reload';
 
-// Auto-reload on stale chunk 404s after deployment (Vite fires this for modulepreload failures).
+// Early client initialization (theme, variant, favicon)
+initClient();
+
 const chunkReloadStorageKey = installChunkReloadGuard(__APP_VERSION__);
 
 // Initialize Vercel Analytics
