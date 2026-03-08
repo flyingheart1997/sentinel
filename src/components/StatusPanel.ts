@@ -61,7 +61,7 @@ export class StatusPanel extends Panel {
     this.allowedFeeds = SITE_VARIANT === 'tech' ? TECH_FEEDS : WORLD_FEEDS;
     this.allowedApis = SITE_VARIANT === 'tech' ? TECH_APIS : WORLD_APIS;
 
-    this.element = h('div', { className: 'status-panel-container' });
+    this.element = h('div', { className: 'panel cy-panel status-panel-container' });
     this.initDefaultStatuses();
   }
 

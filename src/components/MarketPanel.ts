@@ -48,28 +48,28 @@ export class MarketPanel extends Panel {
     });
 
     const modal = document.createElement('div');
-    modal.className = 'modal unified-settings-modal';
+    modal.className = 'modal unified-settings-modal cyber-bracket-modal';
     modal.style.maxWidth = '680px';
+    modal.style.padding = '24px'; /* Adds more breathing room */
 
     modal.innerHTML = `
-      <div class="modal-header">
-        <span class="modal-title">Market watchlist</span>
-        <button class="modal-close" aria-label="Close">×</button>
+      <div class="modal-header" style="border-bottom:none; margin-bottom: 20px;">
+        <span class="modal-title" style="letter-spacing: 1px; color: var(--text-primary);">MARKET WATCHLIST</span>
+        <button class="modal-close" aria-label="Close" style="font-size: 24px; line-height: 1; padding: 0 4px; border:none; background:none; cursor:pointer;">&times;</button>
       </div>
-      <div style="padding:14px 16px 16px 16px">
-        <div style="color:var(--text-dim);font-size:12px;line-height:1.4;margin-bottom:10px">
-          Add extra tickers (comma or newline separated). Friendly labels supported: SYMBOL|Label.
-          Example: TSLA|Tesla, AAPL|Apple, ^GSPC|S&P 500
-          <br/>
+      <div style="padding:0px">
+        <div style="color:var(--text-dim);font-size:12px;line-height:1.4;margin-bottom:12px">
+          Add extra tickers (comma or newline separated). Friendly labels supported: SYMBOL|Label.<br/>
+          Example: TSLA|Tesla, AAPL|Apple, ^GSPC|S&P 500<br/>
           Tip: keep it under ~30 unless you enjoy scrolling.
         </div>
         <textarea id="wmMarketWatchlistInput"
-          style="width:100%;min-height:120px;resize:vertical;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px;font-family:inherit;font-size:12px;outline:none"
+          style="width:100%;min-height:140px;resize:vertical;background:var(--overlay-medium);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:12px;font-family:inherit;font-size:13px;outline:none"
           spellcheck="false"></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-          <button type="button" class="panels-reset-layout" id="wmMarketResetBtn">Reset</button>
-          <button type="button" class="panels-reset-layout" id="wmMarketCancelBtn">Cancel</button>
-          <button type="button" class="panels-reset-layout" id="wmMarketSaveBtn" style="border-color:var(--text-dim);color:var(--text)">Save</button>
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px">
+          <button type="button" class="panels-reset-layout" id="wmMarketResetBtn">RESET</button>
+          <button type="button" class="panels-reset-layout" id="wmMarketCancelBtn">CANCEL</button>
+          <button type="button" class="panels-reset-layout" id="wmMarketSaveBtn" style="border-color:var(--text-dim);color:var(--text)">SAVE</button>
         </div>
       </div>
     `;
@@ -116,13 +116,13 @@ export class MarketPanel extends Panel {
         (stock) => `
       <div class="market-item">
         <div class="market-info">
-          <span class="market-name">${escapeHtml(stock.name)}</span>
-          <span class="market-symbol">${escapeHtml(stock.display)}</span>
+          <span class="market-name cy-text-highlight">${escapeHtml(stock.name)}</span>
+          <span class="market-symbol cy-text-mono">${escapeHtml(stock.display)}</span>
         </div>
         <div class="market-data">
           ${miniSparkline(stock.sparkline, stock.change)}
-          <span class="market-price">${formatPrice(stock.price!)}</span>
-          <span class="market-change ${getChangeClass(stock.change!)}">${formatChange(stock.change!)}</span>
+          <span class="market-price cy-text-mono">${formatPrice(stock.price!)}</span>
+          <span class="market-change cy-text-mono ${getChangeClass(stock.change!)}">${formatChange(stock.change!)}</span>
         </div>
       </div>
     `
@@ -152,8 +152,8 @@ export class HeatmapPanel extends Panel {
         .map(
           (sector) => `
         <div class="heatmap-cell ${getHeatmapClass(sector.change!)}">
-          <div class="sector-name">${escapeHtml(sector.name)}</div>
-          <div class="sector-change ${getChangeClass(sector.change!)}">${formatChange(sector.change!)}</div>
+          <div class="sector-name cy-text-mono">${escapeHtml(sector.name)}</div>
+          <div class="sector-change cy-text-mono ${getChangeClass(sector.change!)}">${formatChange(sector.change!)}</div>
         </div>
       `
         )
@@ -183,10 +183,10 @@ export class CommoditiesPanel extends Panel {
         .map(
           (c) => `
         <div class="commodity-item">
-          <div class="commodity-name">${escapeHtml(c.display)}</div>
+          <div class="commodity-name cy-text-mono">${escapeHtml(c.display)}</div>
           ${miniSparkline(c.sparkline, c.change, 60, 18)}
-          <div class="commodity-price">${formatPrice(c.price!)}</div>
-          <div class="commodity-change ${getChangeClass(c.change!)}">${formatChange(c.change!)}</div>
+          <div class="commodity-price cy-text-mono">${formatPrice(c.price!)}</div>
+          <div class="commodity-change cy-text-mono ${getChangeClass(c.change!)}">${formatChange(c.change!)}</div>
         </div>
       `
         )
@@ -213,13 +213,13 @@ export class CryptoPanel extends Panel {
         (coin) => `
       <div class="market-item">
         <div class="market-info">
-          <span class="market-name">${escapeHtml(coin.name)}</span>
-          <span class="market-symbol">${escapeHtml(coin.symbol)}</span>
+          <span class="market-name cy-text-highlight">${escapeHtml(coin.name)}</span>
+          <span class="market-symbol cy-text-mono">${escapeHtml(coin.symbol)}</span>
         </div>
         <div class="market-data">
           ${miniSparkline(coin.sparkline, coin.change)}
-          <span class="market-price">$${coin.price.toLocaleString()}</span>
-          <span class="market-change ${getChangeClass(coin.change)}">${formatChange(coin.change)}</span>
+          <span class="market-price cy-text-mono">$${coin.price.toLocaleString()}</span>
+          <span class="market-change cy-text-mono ${getChangeClass(coin.change)}">${formatChange(coin.change)}</span>
         </div>
       </div>
     `

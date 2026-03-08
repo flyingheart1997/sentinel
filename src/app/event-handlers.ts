@@ -6,7 +6,6 @@ import type { MapView } from '@/components';
 import type { ClusteredEvent } from '@/types';
 import type { DashboardSnapshot } from '@/services/storage';
 import {
-  PlaybackControl,
   StatusPanel,
   PizzIntIndicator,
   CIIPanel,
@@ -17,8 +16,6 @@ import {
   debounce,
   saveToStorage,
   ExportPanel,
-  getCurrentTheme,
-  setTheme,
 } from '@/utils';
 import {
   IDLE_PAUSE_MS,
@@ -37,7 +34,6 @@ import {
 import {
   trackPanelView,
   trackVariantSwitch,
-  trackThemeChanged,
   trackMapViewChange,
   trackMapLayerToggle,
   trackPanelToggled,
@@ -282,12 +278,7 @@ export class EventHandlerManager implements AppModule {
     };
     window.addEventListener('storage', this.boundStorageHandler);
 
-    document.getElementById('headerThemeToggle')?.addEventListener('click', () => {
-      const next = getCurrentTheme() === 'dark' ? 'light' : 'dark';
-      setTheme(next);
-      this.updateHeaderThemeIcon();
-      trackThemeChanged(next);
-    });
+
 
     const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if (this.ctx.isDesktopApp || isLocalDev) {
@@ -350,12 +341,7 @@ export class EventHandlerManager implements AppModule {
     };
     window.addEventListener('focal-points-ready', this.boundFocalPointsReadyHandler);
 
-    this.boundThemeChangedHandler = () => {
-      this.ctx.map?.render();
-      this.updateHeaderThemeIcon();
-      this.updateMobileMenuThemeItem();
-    };
-    window.addEventListener('theme-changed', this.boundThemeChangedHandler);
+
 
     this.setupMobileMenu();
 
@@ -435,14 +421,6 @@ export class EventHandlerManager implements AppModule {
     document.getElementById('mobileMenuSettings')?.addEventListener('click', () => {
       this.closeMobileMenu();
       this.ctx.unifiedSettings?.open();
-    });
-
-    document.getElementById('mobileMenuTheme')?.addEventListener('click', () => {
-      this.closeMobileMenu();
-      const next = getCurrentTheme() === 'dark' ? 'light' : 'dark';
-      setTheme(next);
-      this.updateHeaderThemeIcon();
-      trackThemeChanged(next);
     });
 
     const sheetBackdrop = document.getElementById('regionSheetBackdrop');
@@ -573,6 +551,8 @@ export class EventHandlerManager implements AppModule {
     const baseUrl = `${window.location.origin}${window.location.pathname}`;
     const briefPage = this.ctx.countryBriefPage;
     const isCountryVisible = briefPage?.isVisible() ?? false;
+    const selected = (this.ctx as any).sidePanel?.getSelectedId();
+
     return buildMapUrl(baseUrl, {
       view: state.view,
       zoom: state.zoom,
@@ -581,6 +561,7 @@ export class EventHandlerManager implements AppModule {
       layers: state.layers,
       country: isCountryVisible ? (briefPage?.getCode() ?? undefined) : undefined,
       expanded: isCountryVisible && briefPage?.getIsMaximized?.() ? true : undefined,
+      selected: selected || undefined,
     });
   }
 
@@ -632,9 +613,9 @@ export class EventHandlerManager implements AppModule {
       ).join('');
 
       dropdown.innerHTML = `
-        <div class="dl-dd-tagline">${t('modals.downloadBanner.description')}</div>
+        <div class="dl-dd-tagline cy-text-muted">${t('modals.downloadBanner.description')}</div>
         <div class="dl-dd-buttons">${primaryHtml}</div>
-        ${others.length ? `<button class="dl-dd-toggle" id="dlDdToggle">${t('modals.downloadBanner.showAllPlatforms')}</button>
+        ${others.length ? `<button class="dl-dd-toggle cy-badge" id="dlDdToggle">${t('modals.downloadBanner.showAllPlatforms')}</button>
         <div class="dl-dd-others" id="dlDdOthers">${othersHtml}</div>` : ''}
       `;
 
@@ -704,24 +685,7 @@ export class EventHandlerManager implements AppModule {
     }
   }
 
-  updateHeaderThemeIcon(): void {
-    const btn = document.getElementById('headerThemeToggle');
-    if (!btn) return;
-    const isDark = getCurrentTheme() === 'dark';
-    btn.innerHTML = isDark
-      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
-  }
 
-  private updateMobileMenuThemeItem(): void {
-    const btn = document.getElementById('mobileMenuTheme');
-    if (!btn) return;
-    const isDark = getCurrentTheme() === 'dark';
-    const icon = btn.querySelector('.mobile-menu-item-icon');
-    const label = btn.querySelector('.mobile-menu-item-label');
-    if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-  }
 
   startHeaderClock(): void {
     const el = document.getElementById('headerClock');
@@ -738,10 +702,8 @@ export class EventHandlerManager implements AppModule {
   }
 
   setupPizzIntIndicator(): void {
-    if (SITE_VARIANT === 'tech' || SITE_VARIANT === 'finance' || SITE_VARIANT === 'happy') return;
-
     this.ctx.pizzintIndicator = new PizzIntIndicator();
-    const headerLeft = this.ctx.container.querySelector('.header-left');
+    const headerLeft = document.querySelector('.header-left');
     if (headerLeft) {
       headerLeft.appendChild(this.ctx.pizzintIndicator.getElement());
     }
@@ -827,23 +789,6 @@ export class EventHandlerManager implements AppModule {
     }
   }
 
-  setupPlaybackControl(): void {
-    this.ctx.playbackControl = new PlaybackControl();
-    this.ctx.playbackControl.onSnapshot((snapshot) => {
-      if (snapshot) {
-        this.ctx.isPlaybackMode = true;
-        this.restoreSnapshot(snapshot);
-      } else {
-        this.ctx.isPlaybackMode = false;
-        this.callbacks.loadAllData();
-      }
-    });
-
-    const headerRight = this.ctx.container.querySelector('.header-right');
-    if (headerRight) {
-      headerRight.insertBefore(this.ctx.playbackControl.getElement(), headerRight.firstChild);
-    }
-  }
 
   setupSnapshotSaving(): void {
     const saveCurrentSnapshot = async () => {

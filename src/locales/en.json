@@ -999,6 +999,7 @@
         "militaryBases": "Military Bases",
         "nuclearSites": "Nuclear Sites",
         "gammaIrradiators": "Gamma Irradiators",
+        "weather": "Weather Alerts",
         "spaceports": "Spaceports",
         "pipelines": "Pipelines",
         "militaryActivity": "Military Activity",
@@ -1008,7 +1009,8 @@
         "ucdpEvents": "Armed Conflict Events",
         "displacementFlows": "Displacement Flows",
         "climateAnomalies": "Climate Anomalies",
-        "weatherAlerts": "Weather Alerts",
+        "sanctions": "Sanctions",
+        "maritime": "Maritime Zones",
         "strategicWaterways": "Strategic Waterways",
         "economicCenters": "Economic Centers",
         "criticalMinerals": "Critical Minerals",
@@ -1052,8 +1054,12 @@
         "internetOutage": "Internet Outage",
         "medium": "medium",
         "news": "News",
+        "maritimeZone": "Maritime Zone",
         "undisclosed": "Undisclosed",
-        "stake": "stake"
+        "stake": "stake",
+        "climateAnomaly": "Climate Anomaly",
+        "tempDelta": "Temp Delta",
+        "precipDelta": "Precip Delta"
       },
       "layerHelp": {
         "title": "Map Layers Guide",
@@ -2044,7 +2050,6 @@
       "deploymentStatus": "STATUS",
       "usniIntel": "USNI Intel",
       "usniSource": "Source: USNI News Fleet Tracker",
-      "approximatePosition": "Position approximate — based on USNI weekly report, not real-time AIS.",
       "darkDescription": "⚠ Vessel has gone dark - AIS signal lost. May indicate sensitive operations."
     },
     "militaryCluster": {

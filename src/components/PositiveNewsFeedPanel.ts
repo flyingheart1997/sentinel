@@ -133,7 +133,7 @@ export class PositiveNewsFeedPanel extends Panel {
     if (!item) return;
 
     // Fire-and-forget share
-    shareHappyCard(item).catch(() => {});
+    shareHappyCard(item).catch(() => { });
 
     // Brief visual feedback
     shareBtn.classList.add('shared');

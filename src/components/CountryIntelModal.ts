@@ -49,12 +49,12 @@ export class CountryIntelModal {
     this.overlay = document.createElement('div');
     this.overlay.className = 'country-intel-overlay';
     this.overlay.innerHTML = `
-      <div class="country-intel-modal">
-        <div class="country-intel-header">
-          <div class="country-intel-title"></div>
-          <button class="country-intel-close" aria-label="Close">×</button>
+      <div class="country-intel-modal cy-panel">
+        <div class="country-intel-header cy-panel-header">
+          <div class="country-intel-title cy-panel-title"></div>
+          <button class="country-intel-close cy-badge" aria-label="Close">×</button>
         </div>
-        <div class="country-intel-content"></div>
+        <div class="country-intel-content cy-panel-body"></div>
       </div>
     `;
     document.body.appendChild(this.overlay);
@@ -110,7 +110,7 @@ export class CountryIntelModal {
     this.currentCode = '__loading__';
     this.headerEl.innerHTML = `
       <span class="country-flag">🌍</span>
-      <span class="country-name">${t('modals.countryIntel.identifying')}</span>
+      <span class="country-name cy-panel-title">${t('modals.countryIntel.identifying')}</span>
     `;
     this.contentEl.innerHTML = `
       <div class="intel-brief-section">
@@ -133,9 +133,9 @@ export class CountryIntelModal {
 
     this.headerEl.innerHTML = `
       <span class="country-flag">${flag}</span>
-      <span class="country-name">${escapeHtml(country)}</span>
+      <span class="country-name cy-panel-title">${escapeHtml(country)}</span>
       ${score ? this.levelBadge(score.level) : ''}
-      <button class="country-intel-share-btn" title="${t('modals.story.shareTitle')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+      <button class="country-intel-share-btn cy-badge" title="${t('modals.story.shareTitle')}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
     `;
 
     if (score) {

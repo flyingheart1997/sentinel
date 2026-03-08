@@ -344,7 +344,11 @@ export class MapContainer {
 
   public getCenter(): { lat: number; lon: number } | null {
     if (this.useGlobe) return this.globeMap?.getCenter() ?? null;
-    if (this.useDeckGL) return this.deckGLMap?.getCenter() ?? null;
+    if (this.useDeckGL) {
+      const c = this.deckGLMap?.getCenter();
+      if (!c) return null;
+      return { lon: c[0], lat: c[1] };
+    }
     return this.svgMap?.getCenter() ?? null;
   }
 

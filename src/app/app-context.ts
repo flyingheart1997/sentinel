@@ -10,7 +10,6 @@ import type { TimeRange } from '@/components';
 import type { Earthquake } from '@/services/earthquakes';
 import type { CountryBriefPanel } from '@/components/CountryBriefPanel';
 import type { CountryTimeline } from '@/components/CountryTimeline';
-import type { PlaybackControl } from '@/components';
 import type { ExportPanel } from '@/utils';
 import type { UnifiedSettings } from '@/components/UnifiedSettings';
 import type { PizzIntIndicator } from '@/components';
@@ -100,7 +99,6 @@ export interface AppContext {
   searchModal: SearchModal | null;
   findingsBadge: IntelligenceGapBadge | null;
   breakingBanner: BreakingNewsBanner | null;
-  playbackControl: PlaybackControl | null;
   exportPanel: ExportPanel | null;
   unifiedSettings: UnifiedSettings | null;
   pizzintIndicator: PizzIntIndicator | null;

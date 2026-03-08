@@ -23,7 +23,7 @@ export class GdeltIntelPanel extends Panel {
       title: t('panels.gdeltIntel'),
       showCount: true,
       trackActivity: true,
-      infoTooltip: t('components.gdeltIntel.infoTooltip'),
+      infoTooltip: t('components.gdeltIntel.infoTooltip')
     });
     this.createTabs();
     this.loadActiveTopic();

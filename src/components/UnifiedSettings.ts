@@ -277,10 +277,10 @@ export class UnifiedSettings {
     const tabClass = (id: TabId) => `unified-settings-tab${this.activeTab === id ? ' active' : ''}`;
 
     this.overlay.innerHTML = `
-      <div class="modal unified-settings-modal">
-        <div class="modal-header">
-          <span class="modal-title">${t('header.settings')}</span>
-          <button class="modal-close unified-settings-close" aria-label="Close">×</button>
+      <div class="modal unified-settings-modal cy-panel">
+        <div class="modal-header cy-panel-header">
+          <span class="modal-title cy-panel-title">${t('header.settings')}</span>
+          <button class="modal-close unified-settings-close cy-badge" aria-label="Close">×</button>
         </div>
         <div class="unified-settings-tabs" role="tablist" aria-label="Settings">
           <button class="${tabClass('general')}" data-tab="general" role="tab" aria-selected="${this.activeTab === 'general'}" id="us-tab-general" aria-controls="us-tab-panel-general">${t('header.tabGeneral')}</button>

@@ -6,7 +6,7 @@ const DEFCON_COLORS: Record<number, string> = {
   1: '#ff0040',
   2: '#ff4400',
   3: '#ffaa00',
-  4: '#00aaff',
+  4: '#00AAFFCC',
   5: '#2d8a6e',
 };
 
@@ -17,11 +17,11 @@ export class PizzIntIndicator {
   private tensions: GdeltTensionPair[] = [];
 
   constructor() {
-    const panel = h('div', { className: 'pizzint-panel hidden' },
-      h('div', { className: 'pizzint-header' },
-        h('span', { className: 'pizzint-title' }, t('components.pizzint.title')),
+    const panel = h('div', { className: 'pizzint-panel cy-panel cy-popup hidden' },
+      h('div', { className: 'pizzint-header cy-panel-header' },
+        h('span', { className: 'pizzint-title cy-panel-title' }, t('components.pizzint.title')),
         h('button', {
-          className: 'pizzint-close',
+          className: 'pizzint-close cy-badge',
           onClick: () => { this.isExpanded = false; panel.classList.add('hidden'); },
         }, '×'),
       ),

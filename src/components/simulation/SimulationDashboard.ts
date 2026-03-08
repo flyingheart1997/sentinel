@@ -53,33 +53,40 @@ export class SimulationDashboard extends Component<any, { dragSpeed: number | nu
                 : `${progress}% Synchronizing telemetry streams...`;
 
             return h('div', { class: 'loading-overlay' },
-                h('div', { class: 'loading-content' },
-                    h('div', { class: 'spinner-orbital' }),
-                    h('h2', { class: 'loading-title', style: { fontFamily: "'Aldrich', sans-serif" } }, loadingTitle),
-                    h('p', { class: 'loading-sub', style: { color: '#00ffff' } }, loadingSub),
-                    h('div', { class: 'sim-heartbeat-container' },
-                        h('svg', { class: 'sim-heartbeat-svg', viewBox: "0 0 400 60", preserveAspectRatio: "none" },
-                            // Path data for a professional ECG/Heartbeat
+                h('div', { class: 'loader-content' },
+                    // Corner brackets
+                    h('div', { class: 'corner top-left' }),
+                    h('div', { class: 'corner top-right' }),
+                    h('div', { class: 'corner bottom-left' }),
+                    h('div', { class: 'corner bottom-right' }),
+                    h('div', { class: 'cy-scanning' }),
+
+                    h('div', { class: 'loader-brand' },
+                        h('h1', null, 'SENTINEL'),
+                        h('p', null, loadingTitle)
+                    ),
+
+                    h('div', { class: 'heartbeat-container' },
+                        h('svg', { class: 'heartbeat-svg', viewBox: "0 0 400 100", preserveAspectRatio: "none" },
                             h('path', {
-                                class: 'sim-heartbeat-bg',
-                                d: "M 0 30 L 80 30 L 90 20 L 100 40 L 110 30 L 140 30 L 150 10 L 160 55 L 170 30 L 200 30 L 210 20 L 220 40 L 230 30 L 260 30 L 270 10 L 280 55 L 290 30 L 320 30 L 330 20 L 340 40 L 350 30 L 400 30"
+                                class: 'heartbeat-bg',
+                                d: "M 0 50 L 80 50 L 90 30 L 100 70 L 110 50 L 140 50 L 150 10 L 160 90 L 170 50 L 200 50 L 210 30 L 220 70 L 230 50 L 260 50 L 270 10 L 280 90 L 290 50 L 320 50 L 330 30 L 340 70 L 350 50 L 400 50"
                             }),
                             h('path', {
-                                class: 'sim-heartbeat-progress',
-                                d: "M 0 30 L 80 30 L 90 20 L 100 40 L 110 30 L 140 30 L 150 10 L 160 55 L 170 30 L 200 30 L 210 20 L 220 40 L 230 30 L 260 30 L 270 10 L 280 55 L 290 30 L 320 30 L 330 20 L 340 40 L 350 30 L 400 30",
+                                id: 'heartbeat-progress-path',
+                                class: 'heartbeat-progress',
+                                d: "M 0 50 L 80 50 L 90 30 L 100 70 L 110 50 L 140 50 L 150 10 L 160 90 L 170 50 L 200 50 L 210 30 L 220 70 L 230 50 L 260 50 L 270 10 L 280 90 L 290 50 L 320 50 L 330 30 L 340 70 L 350 50 L 400 50",
                                 style: {
                                     strokeDasharray: 1000,
                                     strokeDashoffset: (1000 - (1000 * (progress / 100)))
                                 }
-                            }),
-                            // The pulse dot follows the horizontal progress
-                            h('circle', {
-                                class: 'sim-heartbeat-dot',
-                                cx: (progress / 100) * 400,
-                                cy: 30,
-                                r: 4
                             })
                         )
+                    ),
+
+                    h('div', { class: 'loader-status' },
+                        h('span', { class: 'loader-message' }, loadingSub.split('%')[1]?.trim() || loadingSub),
+                        h('span', { class: 'loader-percentage' }, `${progress}%`)
                     )
                 )
             );

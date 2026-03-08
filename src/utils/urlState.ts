@@ -50,6 +50,7 @@ export interface ParsedMapUrlState {
   layers?: MapLayers;
   country?: string;
   expanded?: boolean;
+  selected?: string; // Format: "type:id"
 }
 
 const clamp = (value: number, min: number, max: number): number =>
@@ -86,6 +87,8 @@ export function parseMapUrlState(
   const expandedParam = params.get('expanded');
   const expanded = expandedParam === '1' ? true : undefined;
 
+  const selected = params.get('selected') || undefined;
+
   const layersParam = params.get('layers');
   let layers: MapLayers | undefined;
   if (layersParam !== null) {
@@ -117,6 +120,7 @@ export function parseMapUrlState(
     layers,
     country,
     expanded,
+    selected,
   };
 }
 
@@ -130,6 +134,7 @@ export function buildMapUrl(
     layers: MapLayers;
     country?: string;
     expanded?: boolean;
+    selected?: string;
   }
 ): string {
   const url = new URL(baseUrl);
@@ -153,6 +158,10 @@ export function buildMapUrl(
 
   if (state.expanded) {
     params.set('expanded', '1');
+  }
+
+  if (state.selected) {
+    params.set('selected', state.selected);
   }
 
   url.search = params.toString();

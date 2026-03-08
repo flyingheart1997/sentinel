@@ -68,7 +68,7 @@ export const DEFAULT_MAP_LAYERS: MapLayers = {
   renewableInstallations: true,
   tradeRoutes: false,
   iranAttacks: false,
-  ciiChoropleth: false,
+  ciiChoropleth: false,  maritime: false,
   dayNight: false,
 };
 
@@ -122,7 +122,7 @@ export const MOBILE_DEFAULT_MAP_LAYERS: MapLayers = {
   renewableInstallations: true,
   tradeRoutes: false,
   iranAttacks: false,
-  ciiChoropleth: false,
+  ciiChoropleth: false,  maritime: false,
   dayNight: false,
 };
 

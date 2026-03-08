@@ -257,7 +257,6 @@ export class App {
       searchModal: null,
       findingsBadge: null,
       breakingBanner: null,
-      playbackControl: null,
       exportPanel: null,
       unifiedSettings: null,
       pizzintIndicator: null,
@@ -291,6 +290,7 @@ export class App {
     this.dataLoader = new DataLoaderManager(this.state, {
       renderCriticalBanner: (postures) => this.panelLayout.renderCriticalBanner(postures),
       refreshOpenCountryBrief: () => this.countryIntel.refreshOpenBrief(),
+      updateLoadingProgress: (percent, message) => this.updateLoadingProgress(percent, message),
     });
 
     this.searchManager = new SearchManager(this.state, {
@@ -434,7 +434,6 @@ export class App {
 
     // Phase 3: UI setup methods
     this.eventHandlers.startHeaderClock();
-    this.eventHandlers.setupPlaybackControl();
     this.eventHandlers.setupStatusPanel();
     this.eventHandlers.setupPizzIntIndicator();
     this.eventHandlers.setupExportPanel();
@@ -451,6 +450,7 @@ export class App {
     const initState = parseMapUrlState(window.location.search, this.state.mapLayers);
     this.pendingDeepLinkCountry = initState.country ?? null;
     this.pendingDeepLinkExpanded = initState.expanded === true;
+    (this as any).pendingDeepLinkSelected = initState.selected ?? null;
     const earlyParams = new URLSearchParams(window.location.search);
     this.pendingDeepLinkStoryCode = earlyParams.get('c') ?? null;
     this.eventHandlers.setupUrlStateSync();
@@ -467,6 +467,9 @@ export class App {
     this.dataLoader.syncDataFreshnessWithLayers();
     await preloadCountryGeometry();
     await this.dataLoader.loadAllData();
+
+    // Hide loading screen after all initial processing is done
+    this.hideLoading();
 
     startLearning();
 
@@ -549,6 +552,38 @@ export class App {
         });
         this.eventHandlers.syncUrlState();
       }, DEEP_LINK_INITIAL_DELAY_MS);
+    }
+
+    // Check for entity selection deep link: ?selected=hotspot:123
+    const deepLinkSelected = (this as any).pendingDeepLinkSelected;
+    (this as any).pendingDeepLinkSelected = null;
+    if (deepLinkSelected && deepLinkSelected.includes(':')) {
+      const [type, id] = deepLinkSelected.split(':');
+      if (type && id) {
+        trackDeeplinkOpened('entity', deepLinkSelected);
+        setTimeout(() => {
+          this.triggerEntityClick(type, id);
+        }, DEEP_LINK_INITIAL_DELAY_MS + 500); // Small extra delay to ensure data-driven entities are ready
+      }
+    }
+  }
+
+  private triggerEntityClick(type: string, id: string): void {
+    const map = this.state.map;
+    if (!map) return;
+
+    switch (type) {
+      case 'hotspot': map.triggerHotspotClick(id); break;
+      case 'conflict': map.triggerConflictClick(id); break;
+      case 'base': map.triggerBaseClick(id); break;
+      case 'cable': map.triggerCableClick(id); break;
+      case 'pipeline': map.triggerPipelineClick(id); break;
+      case 'natural': case 'natEvent': (map as any).triggerNaturalEventClick?.(id); break;
+      case 'iranEvent': (map as any).triggerIranEventClick?.(id); break;
+      case 'nuclear': (map as any).triggerNuclearClick?.(id); break;
+      case 'economic': (map as any).triggerEconomicClick?.(id); break;
+      case 'port': (map as any).triggerPortClick?.(id); break;
+      case 'spaceport': (map as any).triggerSpaceportClick?.(id); break;
     }
   }
 
@@ -643,6 +678,53 @@ export class App {
         if (iranEvents) this.state.intelligenceCache.iranEvents = iranEvents;
         return this.dataLoader.loadIntelligenceSignals();
       }, 15 * 60 * 1000);
+    }
+  }
+
+  public updateLoadingProgress(percent: number, message?: string): void {
+    const screen = document.getElementById('loading-screen');
+    if (!screen) return;
+
+    const path = document.getElementById('heartbeat-progress-path') as SVGPathElement | null;
+    const msgEl = screen.querySelector('.loader-message');
+    const pctEl = screen.querySelector('.loader-percentage');
+
+    if (path) {
+      try {
+        const totalLength = path.getTotalLength();
+        path.style.strokeDasharray = totalLength.toString();
+        const offset = totalLength - (totalLength * (percent / 100));
+        path.style.strokeDashoffset = offset.toString();
+      } catch (e) {
+        // Fallback if getTotalLength fails (e.g. path not rendered yet)
+        const totalLength = 1000;
+        const offset = totalLength - (totalLength * (percent / 100));
+        path.style.strokeDashoffset = offset.toString();
+      }
+    }
+
+    // Dot was removed by user, skipping update.
+
+    if (msgEl && message) {
+      msgEl.textContent = message.toUpperCase();
+    }
+
+    if (pctEl) {
+      pctEl.textContent = `${Math.round(percent)}%`;
+    }
+
+    if (percent >= 100) {
+      setTimeout(() => this.hideLoading(), 500);
+    }
+  }
+
+  public hideLoading(): void {
+    const screen = document.getElementById('loading-screen');
+    if (screen) {
+      screen.classList.add('hidden');
+      setTimeout(() => {
+        screen.remove();
+      }, 1000);
     }
   }
 }

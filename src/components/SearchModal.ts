@@ -174,11 +174,11 @@ export class SearchModal {
     this.overlay = document.createElement('div');
 
     if (this.isMobile) {
-      this.overlay.className = 'search-overlay search-mobile';
+      this.overlay.className = 'search-overlay search-mobile cy-panel';
       this.overlay.innerHTML = `
-        <div class="search-sheet">
+        <div class="search-sheet cy-panel-body">
           <div class="search-sheet-handle"></div>
-          <div class="search-sheet-header">
+          <div class="search-sheet-header cy-panel-header">
             <span class="search-sheet-icon">\u{1F50D}</span>
             <input type="text" class="search-input" placeholder="${this.placeholder}" autofocus />
             <button class="search-sheet-cancel" aria-label="Close">\u00D7</button>
@@ -211,8 +211,8 @@ export class SearchModal {
     } else {
       this.overlay.className = 'search-overlay';
       this.overlay.innerHTML = `
-        <div class="search-modal">
-          <div class="search-header">
+        <div class="search-modal cy-panel">
+          <div class="search-header cy-panel-header">
             <span class="search-icon">\u2318</span>
             <input type="text" class="search-input" placeholder="${this.placeholder}" autofocus />
             <kbd class="search-kbd">ESC</kbd>

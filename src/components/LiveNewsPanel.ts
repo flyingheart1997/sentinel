@@ -755,7 +755,7 @@ export class LiveNewsPanel extends Panel {
   /** Creates a single channel tab button with click and drag handlers. */
   private createChannelButton(channel: LiveChannel): HTMLButtonElement {
     const btn = document.createElement('button');
-    btn.className = `live-channel-btn ${channel.id === this.activeChannel.id ? 'active' : ''}`;
+    btn.className = `live-channel-btn cy-badge ${channel.id === this.activeChannel.id ? 'active cy-badge-active' : ''}`;
     btn.dataset.channelId = channel.id;
     btn.textContent = channel.name;
     btn.style.cursor = 'grab';
