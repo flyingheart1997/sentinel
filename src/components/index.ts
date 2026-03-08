@@ -1,7 +1,7 @@
 export * from './Panel';
 export * from './VirtualList';
 export { MapComponent } from './Map';
-export * from './MapPopup';
+export * from './MapSidePanel';
 export { DeckGLMap } from './DeckGLMap';
 export { MapContainer, type MapView, type TimeRange, type MapContainerState } from './MapContainer';
 export * from './NewsPanel';
@@ -9,7 +9,6 @@ export * from './MarketPanel';
 export * from './PredictionPanel';
 export * from './MonitorPanel';
 export * from './SignalModal';
-export * from './PlaybackControl';
 export * from './StatusPanel';
 export * from './EconomicPanel';
 export * from './SearchModal';

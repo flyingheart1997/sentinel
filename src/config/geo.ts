@@ -671,6 +671,51 @@ export const CONFLICT_ZONES: ConflictZone[] = [
   },
 ];
 
+export interface MaritimeZone {
+  id: string;
+  name: string;
+  coords: [number, number][];
+  center: [number, number];
+  type: 'high-risk' | 'monitored' | 'contested';
+  description: string;
+}
+
+export const MARITIME_ZONES: MaritimeZone[] = [
+  {
+    id: 'red_sea_aden',
+    name: 'Red Sea / Gulf of Aden',
+    type: 'high-risk',
+    center: [42.5, 12.5],
+    coords: [[32, 28], [44, 12], [52, 12], [52, 8], [43, 8], [32, 24], [32, 28]],
+    description: 'High risk of maritime attacks and piracy. Active Houthi military operations targeting commercial shipping.'
+  },
+  {
+    id: 'hormuz',
+    name: 'Strait of Hormuz',
+    type: 'monitored',
+    center: [56, 26.5],
+    coords: [[54, 25], [57, 25], [57, 28], [54, 28], [54, 25]],
+    description: 'Critical global energy chokepoint. Frequent naval tensions and Iranian military presence.'
+  },
+  {
+    id: 'south_china_sea',
+    name: 'South China Sea',
+    type: 'contested',
+    center: [114, 10],
+    coords: [[108, 18], [120, 18], [120, 4], [108, 4], [108, 18]],
+    description: 'Highly contested maritime boundaries. Significant military build-up and frequent "freedom of navigation" operations.'
+  },
+  {
+    id: 'black_sea_north',
+    name: 'Northern Black Sea',
+    type: 'high-risk',
+    center: [32, 45],
+    coords: [[29, 44], [35, 44], [35, 47], [29, 47], [29, 44]],
+    description: 'Active war zone. Maritime corridors under threat from naval mines and missile strikes.'
+  }
+];
+
+
 // US Domestic bases (not in overseas dataset - these are CONUS bases)
 const US_DOMESTIC_BASES: MilitaryBase[] = [
   { id: 'norfolk', name: 'Norfolk Naval', lat: 36.95, lon: -76.31, type: 'us-nato', description: 'World largest naval base. Atlantic Fleet HQ.' },

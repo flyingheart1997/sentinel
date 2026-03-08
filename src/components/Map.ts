@@ -45,7 +45,7 @@ import {
   COMMODITY_HUBS,
 } from '@/config';
 import { tokenizeForMatch, matchKeyword, findMatchingKeywords } from '@/utils/keyword-match';
-import { MapPopup } from './MapPopup';
+import { MapSidePanel } from './MapSidePanel';
 import {
   updateHotspotEscalation,
   getHotspotEscalation,
@@ -144,7 +144,7 @@ export class MapComponent {
   private news: NewsItem[] = [];
   private onTechHubClick?: (hub: TechHubActivity) => void;
   private onGeoHubClick?: (hub: GeoHubActivity) => void;
-  private popup: MapPopup;
+  private sidePanel: MapSidePanel;
   private onHotspotClick?: (hotspot: Hotspot) => void;
   private onTimeRangeChange?: (range: TimeRange) => void;
   private onLayerChange?: (layer: keyof MapLayers, enabled: boolean, source: 'user' | 'programmatic') => void;
@@ -193,7 +193,7 @@ export class MapComponent {
     container.appendChild(this.createTimeSlider());
     container.appendChild(this.createLayerToggles());
     container.appendChild(this.createLegend());
-    this.healthCheckLoop = startSmartPollLoop(() => { this.runHealthCheck(); }, {
+    this.healthCheckLoop = startSmartPollLoop(async () => { this.runHealthCheck(); }, {
       intervalMs: 30_000,
       pauseWhenHidden: true,
       refreshOnVisible: false,
@@ -204,7 +204,7 @@ export class MapComponent {
     this.svg = d3.select(svgElement);
     this.baseLayerGroup = this.svg.append('g').attr('class', 'map-base');
     this.dynamicLayerGroup = this.svg.append('g').attr('class', 'map-dynamic');
-    this.popup = new MapPopup(container);
+    this.sidePanel = new MapSidePanel(container);
     this.initClusterRenderer();
 
     this.setupZoomHandlers();
@@ -260,6 +260,7 @@ export class MapComponent {
       this.healthCheckLoop.stop();
       this.healthCheckLoop = null;
     }
+    this.sidePanel?.destroy();
   }
 
   private createControls(): HTMLElement {
@@ -468,7 +469,11 @@ export class MapComponent {
     const helpHeader = `
       <div class="layer-help-header">
         <span>${t('components.deckgl.layerHelp.title')}</span>
-        <button class="layer-help-close" aria-label="Close">×</button>
+        <button class="layer-help-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
     `;
 
@@ -1173,12 +1178,10 @@ export class MapComponent {
 
       path.on('click', (event: MouseEvent) => {
         event.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'cable',
           data: cable,
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
         });
       });
     });
@@ -1219,12 +1222,10 @@ export class MapComponent {
 
       path.on('click', (event: MouseEvent) => {
         event.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'pipeline',
           data: pipeline,
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
         });
       });
     });
@@ -1379,12 +1380,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'nuclear',
             data: facility,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1406,12 +1405,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'irradiator',
             data: irradiator,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1435,12 +1432,10 @@ export class MapComponent {
 
         clickArea.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'conflict',
             data: zone,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1470,12 +1465,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'iranEvent',
             data: ev,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1501,15 +1494,13 @@ export class MapComponent {
         div.addEventListener('click', (e) => {
           e.stopPropagation();
           const relatedNews = this.getRelatedNews(spot);
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'hotspot',
             data: spot,
             relatedNews,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
-          this.popup.loadHotspotGdeltContext(spot);
+          this.sidePanel.loadHotspotGdeltContext(spot);
           this.onHotspotClick?.(spot);
         });
 
@@ -1536,12 +1527,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'base',
             data: base,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1581,12 +1570,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'earthquake',
             data: eq,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1614,12 +1601,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'economic',
             data: center,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1647,12 +1632,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'weather',
             data: alert,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1683,12 +1666,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'outage',
             data: outage,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1719,12 +1700,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'cable-advisory',
             data: advisory,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1752,12 +1731,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'repair-ship',
             data: ship,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1768,30 +1745,58 @@ export class MapComponent {
     // AI Data Centers (always HTML - 🖥️ icons, filter to ≥10k GPUs)
     const MIN_GPU_COUNT = 10000;
     if (this.state.layers.datacenters) {
-      AI_DATA_CENTERS.filter(dc => (dc.chipCount || 0) >= MIN_GPU_COUNT).forEach((dc) => {
-        const pos = projection([dc.lon, dc.lat]);
-        if (!pos) return;
+      const activeDCs = AI_DATA_CENTERS.filter((dc) => (dc.chipCount || 0) >= MIN_GPU_COUNT);
+      const clusterRadius = this.state.zoom >= 4 ? 20 : this.state.zoom >= 3 ? 30 : 45;
+      const clusters = this.clusterMarkers(activeDCs, projection, clusterRadius, (dc) => dc.city || 'Unknown');
+
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
 
         const div = document.createElement('div');
-        const isHighlighted = this.highlightedAssets.datacenter.has(dc.id);
-        div.className = `datacenter-marker ${dc.status}${isHighlighted ? ' asset-highlight asset-highlight-datacenter' : ''}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
+
+        const isHighlighted = cluster.items.some((dc) => this.highlightedAssets.datacenter.has(dc.id));
+        div.className = `datacenter-marker ${primaryItem.status}${isHighlighted ? ' asset-highlight asset-highlight-datacenter' : ''}${isCluster ? ' cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
 
         const icon = document.createElement('div');
         icon.className = 'datacenter-icon';
         icon.textContent = '🖥️';
         div.appendChild(icon);
 
+        if (isCluster) {
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+
+          div.title = cluster.items.map((dc) => dc.name).join(', ');
+        }
+
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'datacenter',
-            data: dc,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'datacenterCluster',
+              data: {
+                items: cluster.items,
+                region: primaryItem.city || primaryItem.country,
+                country: primaryItem.country,
+                count: cluster.items.length,
+                totalChips: cluster.items.reduce((sum, item) => sum + (item.chipCount || 0), 0),
+                totalPowerMW: cluster.items.reduce((sum, item) => sum + (item.powerMW || 0), 0),
+                existingCount: cluster.items.filter((item) => item.status === 'existing').length,
+                plannedCount: cluster.items.filter((item) => item.status === 'planned').length,
+              },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'datacenter',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
@@ -1821,12 +1826,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'spaceport',
             data: port,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1858,12 +1861,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'mineral',
             data: mine,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -1873,78 +1874,115 @@ export class MapComponent {
 
     // === TECH VARIANT LAYERS ===
 
-    // Startup Hubs (🚀 icon by tier)
+    // Startup Hubs (🚀 icon by tier) - with clustering
     if (this.state.layers.startupHubs) {
-      STARTUP_HUBS.forEach((hub) => {
-        const pos = projection([hub.lon, hub.lat]);
-        if (!pos) return;
+      const clusterRadius = this.state.zoom >= 4 ? 20 : this.state.zoom >= 3 ? 30 : 45;
+      const clusters = this.clusterMarkers(STARTUP_HUBS, projection, clusterRadius, hub => hub.city);
+
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
 
         const div = document.createElement('div');
-        div.className = `startup-hub-marker ${hub.tier}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
+
+        div.className = `startup-hub-marker ${primaryItem.tier} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
 
         const icon = document.createElement('div');
         icon.className = 'startup-hub-icon';
-        icon.textContent = hub.tier === 'mega' ? '🦄' : hub.tier === 'major' ? '🚀' : '💡';
+
+        if (isCluster) {
+          icon.textContent = cluster.items.some(h => h.tier === 'mega') ? '🦄' : '🚀';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(h => h.name).join(', ');
+        } else {
+          icon.textContent = primaryItem.tier === 'mega' ? '🦄' : primaryItem.tier === 'major' ? '🚀' : '💡';
+        }
         div.appendChild(icon);
 
-        if (this.state.zoom >= 2 || hub.tier === 'mega') {
+        if (!isCluster && (this.state.zoom >= 2 || primaryItem.tier === 'mega')) {
           const label = document.createElement('div');
           label.className = 'startup-hub-label';
-          label.textContent = hub.name;
+          label.textContent = primaryItem.name;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'startupHub',
-            data: hub,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'startupHubCluster',
+              data: { items: cluster.items, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'startupHub',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
       });
     }
 
-    // Cloud Regions (☁️ icons by provider)
+    // Cloud Regions (☁️ icons by provider) - with clustering
     if (this.state.layers.cloudRegions) {
-      CLOUD_REGIONS.forEach((region) => {
-        const pos = projection([region.lon, region.lat]);
-        if (!pos) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(CLOUD_REGIONS, projection, clusterRadius, region => region.city);
+
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
 
         const div = document.createElement('div');
-        div.className = `cloud-region-marker ${region.provider}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
+
+        div.className = `cloud-region-marker ${primaryItem.provider} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
 
         const icon = document.createElement('div');
         icon.className = 'cloud-region-icon';
-        // Provider-specific icons
         const icons: Record<string, string> = { aws: '🟠', gcp: '🔵', azure: '🟣', cloudflare: '🟡' };
-        icon.textContent = icons[region.provider] || '☁️';
+
+        if (isCluster) {
+          icon.textContent = '☁️';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(r => `${r.provider.toUpperCase()} (${r.name})`).join(', ');
+        } else {
+          icon.textContent = icons[primaryItem.provider] || '☁️';
+        }
         div.appendChild(icon);
 
-        if (this.state.zoom >= 3) {
+        if (!isCluster && this.state.zoom >= 3) {
           const label = document.createElement('div');
           label.className = 'cloud-region-label';
-          label.textContent = region.provider.toUpperCase();
+          label.textContent = primaryItem.provider.toUpperCase();
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'cloudRegion',
-            data: region,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'cloudRegionCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'cloudRegion',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
@@ -1998,21 +2036,17 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
+          // rect removed - no longer needed for panel positioning
           if (isCluster) {
             // Show cluster popup with list of companies
-            this.popup.show({
+            this.sidePanel.show({
               type: 'techHQCluster',
               data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country },
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           } else {
-            this.popup.show({
+            this.sidePanel.show({
               type: 'techHQ',
               data: primaryItem,
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           }
         });
@@ -2021,38 +2055,57 @@ export class MapComponent {
       });
     }
 
-    // Accelerators (🎯 icons)
+    // Accelerators (🎯 icons) - with clustering
     if (this.state.layers.accelerators) {
-      ACCELERATORS.forEach((acc) => {
-        const pos = projection([acc.lon, acc.lat]);
-        if (!pos) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(ACCELERATORS, projection, clusterRadius, acc => acc.city);
+
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
 
         const div = document.createElement('div');
-        div.className = `accelerator-marker ${acc.type}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
+
+        div.className = `accelerator-marker ${primaryItem.type} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
 
         const icon = document.createElement('div');
         icon.className = 'accelerator-icon';
-        icon.textContent = acc.type === 'accelerator' ? '🎯' : acc.type === 'incubator' ? '🔬' : '🎨';
+
+        if (isCluster) {
+          icon.textContent = '🎯';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(a => a.name).join(', ');
+        } else {
+          icon.textContent = primaryItem.type === 'accelerator' ? '🎯' : primaryItem.type === 'incubator' ? '🔬' : '🎨';
+        }
         div.appendChild(icon);
 
-        if (this.state.zoom >= 3) {
+        if (!isCluster && this.state.zoom >= 3) {
           const label = document.createElement('div');
           label.className = 'accelerator-label';
-          label.textContent = acc.name;
+          label.textContent = primaryItem.name;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'accelerator',
-            data: acc,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'acceleratorCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'accelerator',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
@@ -2097,20 +2150,16 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
+          // rect removed - no longer needed for panel positioning
           if (isCluster) {
-            this.popup.show({
+            this.sidePanel.show({
               type: 'techEventCluster',
               data: { items: cluster.items, location: primaryEvent.location, country: primaryEvent.country },
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           } else {
-            this.popup.show({
+            this.sidePanel.show({
               type: 'techEvent',
               data: primaryEvent,
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           }
         });
@@ -2119,148 +2168,216 @@ export class MapComponent {
       });
     }
 
-    // Stock Exchanges (🏛️ icon by tier)
+    // Stock Exchanges (🏛️ icon by tier) - with clustering
     if (this.state.layers.stockExchanges) {
-      STOCK_EXCHANGES.forEach((exchange) => {
-        const pos = projection([exchange.lon, exchange.lat]);
-        if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(STOCK_EXCHANGES, projection, clusterRadius, ex => ex.city);
 
-        const icon = exchange.tier === 'mega' ? '🏛️' : exchange.tier === 'major' ? '📊' : '📈';
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
+
         const div = document.createElement('div');
-        div.className = `map-marker exchange-marker tier-${exchange.tier}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
-        div.style.zIndex = exchange.tier === 'mega' ? '50' : '40';
-        div.textContent = icon;
-        div.title = `${exchange.shortName} (${exchange.city})`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
 
-        if ((this.state.zoom >= 2 && exchange.tier === 'mega') || this.state.zoom >= 3) {
+        div.className = `map-marker exchange-marker tier-${primaryItem.tier} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
+        div.style.zIndex = primaryItem.tier === 'mega' ? '50' : '40';
+
+        if (isCluster) {
+          div.textContent = '🏛️';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(e => e.name).join(', ');
+        } else {
+          div.textContent = primaryItem.tier === 'mega' ? '🏛️' : primaryItem.tier === 'major' ? '📊' : '📈';
+        }
+
+        if (!isCluster && ((this.state.zoom >= 2 && primaryItem.tier === 'mega') || this.state.zoom >= 3)) {
           const label = document.createElement('span');
           label.className = 'marker-label';
-          label.textContent = exchange.shortName;
+          label.textContent = primaryItem.shortName;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'stockExchange',
-            data: exchange,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'stockExchangeCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'stockExchange',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
       });
     }
 
-    // Financial Centers (💰 icon by type)
+    // Financial Centers (💰 icon by type) - with clustering
     if (this.state.layers.financialCenters) {
-      FINANCIAL_CENTERS.forEach((center) => {
-        const pos = projection([center.lon, center.lat]);
-        if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(FINANCIAL_CENTERS, projection, clusterRadius, fc => fc.city);
 
-        const icon = center.type === 'global' ? '💰' : center.type === 'regional' ? '🏦' : '🏝️';
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
+
         const div = document.createElement('div');
-        div.className = `map-marker financial-center-marker type-${center.type}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
-        div.style.zIndex = center.type === 'global' ? '45' : '35';
-        div.textContent = icon;
-        div.title = `${center.name} Financial Center`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
 
-        if ((this.state.zoom >= 2 && center.type === 'global') || this.state.zoom >= 3) {
+        div.className = `map-marker financial-center-marker type-${primaryItem.type} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
+        div.style.zIndex = primaryItem.type === 'global' ? '45' : '35';
+
+        if (isCluster) {
+          div.textContent = '💰';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(f => f.name).join(', ');
+        } else {
+          div.textContent = primaryItem.type === 'global' ? '💰' : primaryItem.type === 'regional' ? '🏦' : '🏝️';
+        }
+
+        if (!isCluster && ((this.state.zoom >= 2 && primaryItem.type === 'global') || this.state.zoom >= 3)) {
           const label = document.createElement('span');
           label.className = 'marker-label';
-          label.textContent = center.name;
+          label.textContent = primaryItem.name;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'financialCenter',
-            data: center,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'financialCenterCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'financialCenter',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
       });
     }
 
-    // Central Banks (🏛️ icon by type)
+    // Central Banks (🏛️ icon by type) - with clustering
     if (this.state.layers.centralBanks) {
-      CENTRAL_BANKS.forEach((bank) => {
-        const pos = projection([bank.lon, bank.lat]);
-        if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(CENTRAL_BANKS, projection, clusterRadius, bank => bank.city);
 
-        const icon = bank.type === 'supranational' ? '🌐' : bank.type === 'major' ? '🏛️' : '🏦';
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
+
         const div = document.createElement('div');
-        div.className = `map-marker central-bank-marker type-${bank.type}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
-        div.style.zIndex = bank.type === 'supranational' ? '48' : bank.type === 'major' ? '42' : '38';
-        div.textContent = icon;
-        div.title = `${bank.shortName} - ${bank.name}`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
 
-        if ((this.state.zoom >= 2 && (bank.type === 'major' || bank.type === 'supranational')) || this.state.zoom >= 3) {
+        div.className = `map-marker central-bank-marker type-${primaryItem.type} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
+        div.style.zIndex = primaryItem.type === 'supranational' ? '48' : primaryItem.type === 'major' ? '42' : '38';
+
+        if (isCluster) {
+          div.textContent = '🏛️';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(b => b.name).join(', ');
+        } else {
+          div.textContent = primaryItem.type === 'supranational' ? '🌐' : primaryItem.type === 'major' ? '🏛️' : '🏦';
+        }
+
+        if (!isCluster && ((this.state.zoom >= 2 && (primaryItem.type === 'major' || primaryItem.type === 'supranational')) || this.state.zoom >= 3)) {
           const label = document.createElement('span');
           label.className = 'marker-label';
-          label.textContent = bank.shortName;
+          label.textContent = primaryItem.shortName;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'centralBank',
-            data: bank,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'centralBankCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'centralBank',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
       });
     }
 
-    // Commodity Hubs (⛽ icon by type)
+    // Commodity Hubs (⛽ icon by type) - with clustering
     if (this.state.layers.commodityHubs) {
-      COMMODITY_HUBS.forEach((hub) => {
-        const pos = projection([hub.lon, hub.lat]);
-        if (!pos || !Number.isFinite(pos[0]) || !Number.isFinite(pos[1])) return;
+      const clusterRadius = this.state.zoom >= 4 ? 15 : this.state.zoom >= 3 ? 25 : 40;
+      const clusters = this.clusterMarkers(COMMODITY_HUBS, projection, clusterRadius, hub => hub.city);
 
-        const icon = hub.type === 'exchange' ? '📦' : hub.type === 'port' ? '🚢' : '⛽';
+      clusters.forEach((cluster) => {
+        if (cluster.items.length === 0) return;
+
         const div = document.createElement('div');
-        div.className = `map-marker commodity-hub-marker type-${hub.type}`;
-        div.style.left = `${pos[0]}px`;
-        div.style.top = `${pos[1]}px`;
-        div.style.zIndex = '38';
-        div.textContent = icon;
-        div.title = `${hub.name} (${hub.city})`;
+        const isCluster = cluster.items.length > 1;
+        const primaryItem = cluster.items[0]!;
 
-        if (this.state.zoom >= 3) {
+        div.className = `map-marker commodity-hub-marker type-${primaryItem.type} ${isCluster ? 'cluster' : ''}`;
+        div.style.left = `${cluster.pos[0]}px`;
+        div.style.top = `${cluster.pos[1]}px`;
+        div.style.zIndex = '38';
+
+        if (isCluster) {
+          div.textContent = '📦';
+          const badge = document.createElement('div');
+          badge.className = 'cluster-badge';
+          badge.textContent = String(cluster.items.length);
+          div.appendChild(badge);
+          div.title = cluster.items.map(h => h.name).join(', ');
+        } else {
+          div.textContent = primaryItem.type === 'exchange' ? '📦' : primaryItem.type === 'port' ? '🚢' : '⛽';
+        }
+
+        if (!isCluster && this.state.zoom >= 3) {
           const label = document.createElement('span');
           label.className = 'marker-label';
-          label.textContent = hub.name;
+          label.textContent = primaryItem.name;
           div.appendChild(label);
         }
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
-            type: 'commodityHub',
-            data: hub,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-          });
+          if (isCluster) {
+            this.sidePanel.show({
+              type: 'commodityHubCluster',
+              data: { items: cluster.items, city: primaryItem.city, country: primaryItem.country, count: cluster.items.length },
+            });
+          } else {
+            this.sidePanel.show({
+              type: 'commodityHub',
+              data: primaryItem,
+            });
+          }
         });
 
         this.overlays.appendChild(div);
@@ -2286,12 +2403,10 @@ export class MapComponent {
         div.addEventListener('click', (e) => {
           e.stopPropagation();
           this.onTechHubClick?.(activity);
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'techActivity',
             data: activity,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2328,12 +2443,10 @@ export class MapComponent {
         div.addEventListener('click', (e) => {
           e.stopPropagation();
           this.onGeoHubClick?.(activity);
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'geoActivity',
             data: activity,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2385,20 +2498,16 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
+          // rect removed - no longer needed for panel positioning
           if (isCluster) {
-            this.popup.show({
+            this.sidePanel.show({
               type: 'protestCluster',
               data: { items: cluster.items, country: primaryEvent.country },
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           } else {
-            this.popup.show({
+            this.sidePanel.show({
               type: 'protest',
               data: primaryEvent,
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
             });
           }
         });
@@ -2432,12 +2541,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'flight',
             data: delay,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2466,12 +2573,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'aircraft',
             data: ac,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2516,12 +2621,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'militaryFlight',
             data: flight,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2571,12 +2674,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'militaryFlightCluster',
             data: cluster,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2619,12 +2720,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'militaryVessel',
             data: vessel,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2673,12 +2772,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'militaryVesselCluster',
             data: cluster,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2718,12 +2815,10 @@ export class MapComponent {
 
         div.addEventListener('click', (e) => {
           e.stopPropagation();
-          const rect = this.container.getBoundingClientRect();
-          this.popup.show({
+          // rect removed - no longer needed for panel positioning
+          this.sidePanel.show({
             type: 'natEvent',
             data: event,
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
           });
         });
 
@@ -2748,6 +2843,15 @@ export class MapComponent {
         dot.style.height = `${size}px`;
         dot.style.backgroundColor = color;
         dot.title = `${fire.region} — ${Math.round(fire.brightness)}K, ${fire.frp}MW`;
+        dot.style.cursor = 'pointer';
+
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.sidePanel.show({
+            type: 'fire',
+            data: fire,
+          });
+        });
 
         this.overlays.appendChild(dot);
       });
@@ -2771,12 +2875,10 @@ export class MapComponent {
 
       div.addEventListener('click', (e) => {
         e.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'waterway',
           data: waterway,
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
         });
       });
 
@@ -2806,12 +2908,10 @@ export class MapComponent {
 
       div.addEventListener('click', (e) => {
         e.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'ais',
           data: event,
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
         });
       });
 
@@ -2841,7 +2941,15 @@ export class MapComponent {
         .attr('r', radius)
         .attr('fill', color)
         .attr('fill-opacity', fillOpacity)
-        .attr('stroke', 'none');
+        .attr('stroke', 'none')
+        .style('cursor', 'pointer')
+        .on('click', (event: MouseEvent) => {
+          event.stopPropagation();
+          this.sidePanel.show({
+            type: 'ais',
+            data: zone,
+          });
+        });
     });
   }
 
@@ -2867,12 +2975,10 @@ export class MapComponent {
 
       div.addEventListener('click', (e) => {
         e.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'port',
           data: port,
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
         });
       });
 
@@ -2896,12 +3002,10 @@ export class MapComponent {
 
       div.addEventListener('click', (e) => {
         e.stopPropagation();
-        const rect = this.container.getBoundingClientRect();
-        this.popup.show({
+        // rect removed - no longer needed for panel positioning
+        this.sidePanel.show({
           type: 'apt',
           data: apt,
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
         });
       });
 
@@ -3161,14 +3265,12 @@ export class MapComponent {
     if (!pos) return;
 
     const relatedNews = this.getRelatedNews(hotspot);
-    this.popup.show({
+    this.sidePanel.show({
       type: 'hotspot',
       data: hotspot,
       relatedNews,
-      x: pos[0],
-      y: pos[1],
     });
-    this.popup.loadHotspotGdeltContext(hotspot);
+    this.sidePanel.loadHotspotGdeltContext(hotspot);
     this.onHotspotClick?.(hotspot);
   }
 
@@ -3182,11 +3284,9 @@ export class MapComponent {
     const pos = projection(conflict.center as [number, number]);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'conflict',
       data: conflict,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3200,11 +3300,9 @@ export class MapComponent {
     const pos = projection([base.lon, base.lat]);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'base',
       data: base,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3219,11 +3317,9 @@ export class MapComponent {
     const pos = projection(midPoint);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'pipeline',
       data: pipeline,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3238,11 +3334,9 @@ export class MapComponent {
     const pos = projection(midPoint);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'cable',
       data: cable,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3256,11 +3350,9 @@ export class MapComponent {
     const pos = projection([dc.lon, dc.lat]);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'datacenter',
       data: dc,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3274,11 +3366,9 @@ export class MapComponent {
     const pos = projection([facility.lon, facility.lat]);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'nuclear',
       data: facility,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3292,11 +3382,9 @@ export class MapComponent {
     const pos = projection([irradiator.lon, irradiator.lat]);
     if (!pos) return;
 
-    this.popup.show({
+    this.sidePanel.show({
       type: 'irradiator',
       data: irradiator,
-      x: pos[0],
-      y: pos[1],
     });
   }
 
@@ -3613,7 +3701,7 @@ export class MapComponent {
   public setCableActivity(advisories: CableAdvisory[], repairShips: RepairShip[]): void {
     this.cableAdvisories = advisories;
     this.repairShips = repairShips;
-    this.popup.setCableActivity(advisories, repairShips);
+    this.sidePanel.setCableActivity(advisories, repairShips);
     this.render();
   }
 

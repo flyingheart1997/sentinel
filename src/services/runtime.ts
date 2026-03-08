@@ -1,4 +1,3 @@
-import { SITE_VARIANT } from '@/config/variant';
 import {
   getApiBaseUrl,
   isDesktopRuntime,
@@ -230,8 +229,6 @@ export function installRuntimeFetchPatch(): void {
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const target = getApiTargetFromRequestInput(input);
     if (!target?.startsWith('/api/')) return nativeFetch(input, init);
-
-    const debug = localStorage.getItem('wm-debug-log') === '1';
 
     // Refresh token if needed
     if (!localApiToken || (Date.now() - tokenFetchedAt > TOKEN_TTL_MS)) {

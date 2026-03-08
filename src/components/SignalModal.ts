@@ -18,10 +18,10 @@ export class SignalModal {
     this.element = document.createElement('div');
     this.element.className = 'signal-modal-overlay';
     this.element.innerHTML = `
-      <div class="signal-modal">
-        <div class="signal-modal-header">
-          <span class="signal-modal-title">🎯 ${t('modals.signal.title')}</span>
-          <button class="signal-modal-close" aria-label="Close">×</button>
+      <div class="signal-modal cy-panel">
+        <div class="signal-modal-header cy-panel-header">
+          <span class="signal-modal-title cy-panel-title">🎯 ${t('modals.signal.title')}</span>
+          <button class="signal-modal-close cy-badge" aria-label="Close">×</button>
         </div>
         <div class="signal-modal-content"></div>
         <div class="signal-modal-footer">
@@ -232,7 +232,7 @@ export class SignalModal {
   public playSound(): void {
     if (this.audioEnabled && this.audio) {
       this.audio.currentTime = 0;
-      this.audio.play()?.catch(() => {});
+      this.audio.play()?.catch(() => { });
     }
   }
 

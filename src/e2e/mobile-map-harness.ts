@@ -1,5 +1,5 @@
 import '../styles/main.css';
-import { MapPopup } from '../components/MapPopup';
+import { MapSidePanel } from '../components/MapSidePanel';
 import type { Hotspot } from '../types';
 
 type MobileMapHarness = {
@@ -57,7 +57,7 @@ const sampleHotspot: Hotspot = {
   status: 'monitoring',
 };
 
-const popup = new MapPopup(app);
+const sidePanel = new MapSidePanel(app);
 
 const hotspot = document.createElement('div');
 hotspot.className = 'hotspot';
@@ -66,13 +66,10 @@ hotspot.style.top = '50%';
 hotspot.innerHTML = '<div class="hotspot-marker high"></div>';
 hotspot.addEventListener('click', (e) => {
   e.stopPropagation();
-  const rect = app.getBoundingClientRect();
-  popup.show({
+  sidePanel.show({
     type: 'hotspot',
     data: sampleHotspot,
     relatedNews: [],
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top,
   });
 });
 overlays.appendChild(hotspot);
@@ -80,7 +77,7 @@ overlays.appendChild(hotspot);
 window.__mobileMapHarness = {
   ready: true,
   getPopupRect: () => {
-    const element = document.querySelector('.map-popup') as HTMLElement | null;
+    const element = document.querySelector('.map-side-panel') as HTMLElement | null;
     if (!element) return null;
     const rect = element.getBoundingClientRect();
     return {

@@ -12,6 +12,8 @@ export interface PanelOptions {
   className?: string;
   trackActivity?: boolean;
   infoTooltip?: string;
+  onHeaderClick?: () => void;
+  disableSidePanelToggle?: boolean;
 }
 
 const PANEL_SPANS_KEY = 'worldmonitor-panel-spans';
@@ -167,6 +169,7 @@ export class Panel {
   protected statusBadgeEl: HTMLElement | null = null;
   protected newBadgeEl: HTMLElement | null = null;
   protected panelId: string;
+  protected panelTitle: string;
   private abortController: AbortController = new AbortController();
   private tooltipCloseHandler: (() => void) | null = null;
   private resizeHandle: HTMLElement | null = null;
@@ -197,18 +200,19 @@ export class Panel {
 
   constructor(options: PanelOptions) {
     this.panelId = options.id;
+    this.panelTitle = options.title;
     this.element = document.createElement('div');
-    this.element.className = `panel ${options.className || ''}`;
+    this.element.className = `panel cy-panel ${options.className || ''}`;
     this.element.dataset.panel = options.id;
 
     this.header = document.createElement('div');
-    this.header.className = 'panel-header';
+    this.header.className = 'panel-header cy-panel-header';
 
     const headerLeft = document.createElement('div');
     headerLeft.className = 'panel-header-left';
 
     const title = document.createElement('span');
-    title.className = 'panel-title';
+    title.className = 'panel-title cy-panel-title';
     title.textContent = options.title;
     headerLeft.appendChild(title);
 
@@ -248,6 +252,24 @@ export class Panel {
     this.statusBadgeEl.style.display = 'none';
     this.header.appendChild(this.statusBadgeEl);
 
+    if (options.onHeaderClick) {
+      this.header.style.cursor = 'pointer';
+      this.header.addEventListener('click', (e) => {
+        // Prevent clicking child buttons from triggering this
+        if ((e.target as HTMLElement).closest('button:not(.panel-header-left)')) return;
+        options.onHeaderClick?.();
+      });
+      // Add a visual hint class
+      this.header.classList.add('clickable-header');
+    } else if (!options.disableSidePanelToggle && options.id !== 'live-news' && !options.id.toLowerCase().includes('webcam')) {
+      this.header.style.cursor = 'pointer';
+      this.header.addEventListener('click', (e) => {
+        if ((e.target as HTMLElement).closest('button')) return; // ignore all buttons!
+        this.openInSidePanel();
+      });
+      this.header.classList.add('clickable-header');
+    }
+
     if (options.showCount) {
       this.countEl = document.createElement('span');
       this.countEl.className = 'panel-count';
@@ -256,7 +278,6 @@ export class Panel {
     }
 
     this.content = document.createElement('div');
-    this.content.className = 'panel-content';
     this.content.id = `${options.id}Content`;
 
     this.element.appendChild(this.header);
@@ -721,6 +742,48 @@ export class Panel {
   public toggle(visible: boolean): void {
     if (visible) this.show();
     else this.hide();
+  }
+
+  protected openInSidePanel(): void {
+    if (this.content.parentElement?.classList.contains('map-side-panel-feed-content')) return;
+
+    const originalParent = this.content.parentElement;
+    if (!originalParent) return;
+
+    const placeholder = document.createElement('div');
+    placeholder.className = 'panel-content-placeholder empty-state cy-panel-body';
+    placeholder.innerHTML = `
+      <div style="padding: 24px; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+        <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" fill="none" style="margin-bottom: 8px;"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <div>Opened in Map Side Panel</div>
+        <button class="cy-btn cy-btn-sm mt-3" id="restore-panel-btn-${this.panelId}">Restore</button>
+      </div>
+    `;
+
+    window.dispatchEvent(new CustomEvent('wm:open-feed-panel', {
+      detail: {
+        type: 'feedPanel',
+        data: { title: this.panelTitle },
+        renderCallback: (contentEl: HTMLElement) => {
+          originalParent.replaceChild(placeholder, this.content);
+          contentEl.appendChild(this.content);
+
+          const restoreBtn = placeholder.querySelector(`#restore-panel-btn-${this.panelId}`);
+          restoreBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('side-panel-close')?.click();
+          });
+
+          setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+        },
+        onClose: () => {
+          if (placeholder.parentElement) {
+            placeholder.parentElement.replaceChild(this.content, placeholder);
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+          }
+        }
+      }
+    }));
   }
 
   /**

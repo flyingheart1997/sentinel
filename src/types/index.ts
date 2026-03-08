@@ -170,6 +170,9 @@ export interface StrategicWaterway {
   lat: number;
   lon: number;
   description?: string;
+  type?: string;
+  vesselsPerDay?: number;
+  globalTradePct?: number;
 }
 
 export type AisDisruptionType = 'gap_spike' | 'chokepoint_congestion';
@@ -437,10 +440,14 @@ export interface NuclearFacility {
 
 export interface GammaIrradiator {
   id: string;
+  name?: string;
   city: string;
   country: string;
   lat: number;
   lon: number;
+  isotope?: string;
+  activityMCi?: number;
+  operator?: string;
   organization?: string;
 }
 
@@ -552,6 +559,7 @@ export interface MapLayers {
   iranAttacks: boolean;
   // GPS/GNSS interference layer
   gpsJamming: boolean;
+  maritime: boolean;
 
   // CII choropleth layer
   ciiChoropleth: boolean;
@@ -563,6 +571,7 @@ export interface AIDataCenter {
   id: string;
   name: string;
   owner: string;
+  city?: string;
   country: string;
   lat: number;
   lon: number;

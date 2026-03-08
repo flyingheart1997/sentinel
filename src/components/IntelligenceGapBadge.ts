@@ -38,6 +38,7 @@ export class IntelligenceFindingsBadge {
   private onAlertClick: ((alert: UnifiedAlert) => void) | null = null;
   private findings: UnifiedFinding[] = [];
   private boundCloseDropdown = () => this.closeDropdown();
+  private ticker: HTMLElement | null = null;
   private pendingUpdateFrame = 0;
   private boundUpdate = () => {
     if (this.pendingUpdateFrame) return;
@@ -57,12 +58,12 @@ export class IntelligenceFindingsBadge {
     this.popupEnabled = localStorage.getItem(POPUP_STORAGE_KEY) === '1';
 
     this.badge = document.createElement('button');
-    this.badge.className = 'intel-findings-badge';
+    this.badge.className = 'intel-findings-badge cy-badge';
     this.badge.title = t('components.intelligenceFindings.badgeTitle');
     this.badge.innerHTML = '<span class="findings-icon">🎯</span><span class="findings-count">0</span>';
 
     this.dropdown = document.createElement('div');
-    this.dropdown.className = 'intel-findings-dropdown';
+    this.dropdown.className = 'intel-findings-dropdown cy-panel cy-popup';
 
     this.badge.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -141,7 +142,7 @@ export class IntelligenceFindingsBadge {
   private playSound(): void {
     if (this.audioEnabled && this.audio) {
       this.audio.currentTime = 0;
-      this.audio.play()?.catch(() => {});
+      this.audio.play()?.catch(() => { });
     }
   }
 
@@ -269,6 +270,40 @@ export class IntelligenceFindingsBadge {
     }
 
     this.renderDropdown();
+    this.updateNewsTicker();
+  }
+
+  private updateNewsTicker(): void {
+    const highPriorityFindings = this.findings.filter(f => f.priority === 'critical' || f.priority === 'high');
+
+    if (highPriorityFindings.length === 0) {
+      if (this.ticker) {
+        this.ticker.classList.remove('active');
+        setTimeout(() => this.ticker?.remove(), 500);
+        this.ticker = null;
+      }
+      return;
+    }
+
+    if (!this.ticker) {
+      this.ticker = document.createElement('div');
+      this.ticker.className = 'intel-news-ticker';
+      document.body.appendChild(this.ticker);
+      // Trigger reflow for animation
+      requestAnimationFrame(() => this.ticker?.classList.add('active'));
+    }
+
+    const itemsHtml = highPriorityFindings.map(f => {
+      const icon = this.getTypeIcon(f.type);
+      const priorityLabel = t(`components.intelligenceFindings.priority.${f.priority}`).toUpperCase();
+      return `<div class="ticker-item ${f.priority}">
+        <span class="ticker-priority">${priorityLabel}</span>
+        <span class="ticker-text">${icon} ${escapeHtml(f.title)}: ${escapeHtml(f.description)}</span>
+      </div>`;
+    }).join('<div class="ticker-separator"></div>');
+
+    // Duplicate content for seamless scrolling
+    this.ticker.innerHTML = `<div class="ticker-scroll">${itemsHtml}<div class="ticker-separator"></div>${itemsHtml}</div>`;
   }
 
   private mergeFindings(): UnifiedFinding[] {
@@ -339,8 +374,8 @@ export class IntelligenceFindingsBadge {
 
     if (this.findings.length === 0) {
       this.dropdown.innerHTML = `
-        <div class="findings-header">
-          <span class="header-title">${t('components.intelligenceFindings.title')}</span>
+        <div class="findings-header cy-panel-header">
+          <span class="header-title cy-panel-title">${t('components.intelligenceFindings.title')}</span>
           <span class="findings-badge none">${t('components.intelligenceFindings.monitoring')}</span>
         </div>
         ${toggleHtml}
@@ -390,8 +425,8 @@ export class IntelligenceFindingsBadge {
 
     const moreCount = this.findings.length - MAX_VISIBLE_FINDINGS;
     this.dropdown.innerHTML = `
-      <div class="findings-header">
-        <span class="header-title">${t('components.intelligenceFindings.title')}</span>
+      <div class="findings-header cy-panel-header">
+        <span class="header-title cy-panel-title">${t('components.intelligenceFindings.title')}</span>
         <span class="findings-badge ${statusClass}">${statusText}</span>
       </div>
       ${toggleHtml}
@@ -496,10 +531,10 @@ export class IntelligenceFindingsBadge {
     }).join('');
 
     overlay.innerHTML = `
-      <div class="findings-modal">
-        <div class="findings-modal-header">
-          <span class="findings-modal-title">🎯 ${t('components.intelligenceFindings.all', { count: String(this.findings.length) })}</span>
-          <button class="findings-modal-close" aria-label="Close">×</button>
+      <div class="findings-modal cy-panel">
+        <div class="findings-modal-header cy-panel-header">
+          <span class="findings-modal-title cy-panel-title">🎯 ${t('components.intelligenceFindings.all', { count: String(this.findings.length) })}</span>
+          <button class="findings-modal-close cy-badge" aria-label="Close">×</button>
         </div>
         <div class="findings-modal-content">
           ${findingsHtml}

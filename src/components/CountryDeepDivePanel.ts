@@ -539,18 +539,18 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     this.content.replaceChildren();
 
     const shell = this.el('div', 'cdp-shell');
-    const header = this.el('header', 'cdp-header');
+    const header = this.el('header', 'cdp-header cy-panel-header');
     const left = this.el('div', 'cdp-header-left');
     const flag = this.el('span', 'cdp-flag', CountryDeepDivePanel.toFlagEmoji(code));
     const titleWrap = this.el('div', 'cdp-title-wrap');
-    const name = this.el('h2', 'cdp-country-name', country);
+    const name = this.el('h2', 'cdp-country-name cy-panel-title', country);
     const subtitle = this.el('div', 'cdp-country-subtitle', `${code.toUpperCase()} • Country Intelligence`);
     titleWrap.append(name, subtitle);
     left.append(flag, titleWrap);
 
     const right = this.el('div', 'cdp-header-right');
 
-    const maxBtn = this.el('button', 'cdp-maximize-btn', '\u26F6') as HTMLButtonElement;
+    const maxBtn = this.el('button', 'cdp-maximize-btn cy-badge', '\u26F6') as HTMLButtonElement;
     maxBtn.setAttribute('type', 'button');
     maxBtn.setAttribute('aria-label', 'Toggle maximize');
     maxBtn.addEventListener('click', () => {
@@ -559,7 +559,7 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     });
     this.maximizeButton = maxBtn;
 
-    const shareBtn = this.el('button', 'cdp-action-btn cdp-share-btn') as HTMLButtonElement;
+    const shareBtn = this.el('button', 'cdp-action-btn cdp-share-btn cy-badge') as HTMLButtonElement;
     shareBtn.setAttribute('type', 'button');
     shareBtn.setAttribute('aria-label', t('components.countryBrief.shareLink'));
     shareBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
@@ -570,10 +570,10 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
         const orig = shareBtn.innerHTML;
         shareBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
         setTimeout(() => { shareBtn.innerHTML = orig; }, 1500);
-      }).catch(() => {});
+      }).catch(() => { });
     });
 
-    const storyButton = this.el('button', 'cdp-action-btn', 'Story') as HTMLButtonElement;
+    const storyButton = this.el('button', 'cdp-action-btn cy-badge', 'Story') as HTMLButtonElement;
     storyButton.setAttribute('type', 'button');
     storyButton.addEventListener('click', () => {
       if (this.onShareStory && this.currentCode && this.currentName) {
@@ -581,7 +581,7 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
       }
     });
 
-    const exportButton = this.el('button', 'cdp-action-btn', 'Export') as HTMLButtonElement;
+    const exportButton = this.el('button', 'cdp-action-btn cy-badge', 'Export') as HTMLButtonElement;
     exportButton.setAttribute('type', 'button');
     exportButton.addEventListener('click', () => {
       if (this.onExportImage && this.currentCode && this.currentName) {
@@ -611,7 +611,7 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
       scoreCard.append(this.makeEmpty(t('countryBrief.ciiUnavailable')));
     }
 
-    const bodyGrid = this.el('div', 'cdp-grid');
+    const bodyGrid = this.el('div', 'cdp-grid cy-panel-body');
     const [signalsCard, signalBody] = this.sectionCard(t('countryBrief.activeSignals'));
     const [timelineCard, timelineBody] = this.sectionCard(t('countryBrief.timeline'));
     const [newsCard, newsBody] = this.sectionCard(t('countryBrief.topNews'));
@@ -671,7 +671,7 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     if (signals.travelAdvisories > 0 && signals.travelAdvisoryMaxLevel) {
       const advLabel = signals.travelAdvisoryMaxLevel === 'do-not-travel' ? t('countryBrief.chips.doNotTravel')
         : signals.travelAdvisoryMaxLevel === 'reconsider' ? t('countryBrief.chips.reconsiderTravel')
-        : t('countryBrief.chips.exerciseCaution');
+          : t('countryBrief.chips.exerciseCaution');
       chips.append(this.makeSignalChip(`⚠️ ${signals.travelAdvisories} ${t('countryBrief.chips.advisory')}: ${advLabel}`, 'advisory'));
     }
     this.addSignalChip(chips, signals.orefSirens, t('countryBrief.chips.activeSirens'), '🚨', 'conflict');
@@ -720,8 +720,8 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
       const pct = Math.min(100, Math.max(0, item.value));
       const color = pct >= 70 ? getCSSColor('--semantic-critical')
         : pct >= 50 ? getCSSColor('--semantic-high')
-        : pct >= 30 ? getCSSColor('--semantic-elevated')
-        : getCSSColor('--semantic-normal');
+          : pct >= 30 ? getCSSColor('--semantic-elevated')
+            : getCSSColor('--semantic-normal');
       const barFill = this.el('div', 'cdp-comp-fill');
       barFill.style.width = `${pct}%`;
       barFill.style.background = color;
@@ -830,13 +830,13 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     const existing = document.getElementById('country-deep-dive-panel');
     if (existing) return existing;
 
-    const panel = this.el('aside', 'country-deep-dive');
+    const panel = this.el('aside', 'country-deep-dive cy-panel');
     panel.id = 'country-deep-dive-panel';
     panel.setAttribute('aria-label', 'Country Intelligence');
     panel.setAttribute('aria-hidden', 'true');
 
     const shell = this.el('div', 'country-deep-dive-shell');
-    const close = this.el('button', 'panel-close', '×') as HTMLButtonElement;
+    const close = this.el('button', 'panel-close cy-badge', '×') as HTMLButtonElement;
     close.id = 'deep-dive-close';
     close.setAttribute('aria-label', 'Close');
 

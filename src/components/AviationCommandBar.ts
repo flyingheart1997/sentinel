@@ -153,10 +153,10 @@ export class AviationCommandBar {
         this.overlay = document.createElement('div');
         this.overlay.id = 'aviation-cmd-overlay';
         this.overlay.innerHTML = `
-      <div id="aviation-cmd-box">
-        <div id="aviation-cmd-header">
-          <span>✈️ Aviation Command</span>
-          <button id="aviation-cmd-close">×</button>
+      <div id="aviation-cmd-box" class="cy-panel">
+        <div id="aviation-cmd-header" class="cy-panel-header">
+          <span class="cy-panel-title">✈️ Aviation Command</span>
+          <button id="aviation-cmd-close" class="cy-badge">×</button>
         </div>
         <input id="aviation-cmd-input" type="text" placeholder="ops IST  /  flight TK1  /  price IST LHR  /  brief" autocomplete="off" spellcheck="false">
         <div id="aviation-cmd-suggestions"></div>
@@ -264,9 +264,9 @@ export class AviationCommandBar {
         style.id = 'aviation-cmd-styles';
         style.textContent = `
       #aviation-cmd-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding-top:80px; }
-      #aviation-cmd-box { background:var(--panel-bg,#1a1f2e);border:1px solid var(--border-color,#374151);border-radius:10px;padding:16px;width:min(560px,92vw);box-shadow:0 24px 60px rgba(0,0,0,.7);max-height:80vh;overflow-y:auto; }
-      #aviation-cmd-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px;font-weight:600;color:var(--text-primary,#e5e7eb); }
-      #aviation-cmd-close { background:none;border:none;color:#6b7280;cursor:pointer;font-size:18px;line-height:1; }
+      #aviation-cmd-box { border-radius:10px;padding:16px;width:min(560px,92vw);box-shadow:0 24px 60px rgba(0,0,0,.7);max-height:80vh;overflow-y:auto; }
+      #aviation-cmd-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+      #aviation-cmd-close { background:none;border:none;cursor:pointer;font-size:18px;line-height:1; }
       #aviation-cmd-input { width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid var(--border-color,#374151);border-radius:6px;color:var(--text-primary,#e5e7eb);font-size:14px;padding:10px;outline:none; }
       #aviation-cmd-input:focus { border-color:var(--accent,#60a5fa); }
       #aviation-cmd-result { margin-top:12px;font-size:13px; }

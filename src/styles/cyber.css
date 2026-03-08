@@ -1,0 +1,379 @@
+/**
+ * GLOBAL CYBER AESTHETIC - main dashboard theme
+ * Inspired by simulation UI, using `cy-` prefixes to avoid conflicts.
+ */
+
+:root {
+  /* Core Colors */
+  --cy-bg: #030a10;
+  --cy-panel-bg: rgba(6, 15, 25, 0.85);
+  --cy-border: #0a2e4a;
+  --cy-border-highlight: #00d2ff;
+  --cy-cyan: #00e5ff;
+  --cy-cyan-dim: rgba(0, 229, 255, 0.2);
+  --cy-purple: #b538ff;
+  --cy-pink: #f92f60;
+  --cy-green: #00ff66;
+  --cy-yellow: #ffcc00;
+
+  /* Typography */
+  --cy-text-primary: #e0f2fe;
+  --cy-text-secondary: #94a3b8;
+  --cy-text-muted: #475569;
+
+  /* Effects */
+  --cy-glow-cyan: 0 0 10px rgba(0, 229, 255, 0.4);
+  --cy-glow-pink: 0 0 10px rgba(249, 47, 96, 0.4);
+  --cy-backdrop: blur(12px);
+
+  /* Fonts */
+  --cy-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --cy-font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* --- GLOBAL ROOT OVERRIDES FOR MAIN.CSS COMPONENTS --- */
+  --bg: var(--cy-bg);
+  --bg-secondary: rgba(6, 15, 25, 1);
+  --surface: var(--cy-panel-bg);
+  --surface-hover: rgba(0, 229, 255, 0.1);
+  --surface-active: rgba(0, 229, 255, 0.15);
+  
+  --border: var(--cy-border);
+  --border-strong: var(--cy-border-highlight);
+  --border-subtle: rgba(10, 46, 74, 0.5);
+  
+  /* Fonts Override for premium aesthetic */
+  --font-body: var(--cy-font-mono);
+  --font-mono: var(--cy-font-mono);
+  --font-sans: var(--cy-font-sans);
+  
+  --text: var(--cy-text-primary);
+  --text-primary: var(--cy-text-primary);
+  --text-secondary: var(--cy-text-secondary);
+  --text-muted: var(--cy-text-muted);
+  --text-dim: var(--cy-text-muted);
+  --text-faint: rgba(148, 163, 184, 0.5);
+  --text-ghost: rgba(148, 163, 184, 0.3);
+  
+  --accent: var(--cy-cyan);
+  --primary: var(--cy-cyan);
+  --primary-foreground: #000;
+  
+  --panel-bg: var(--cy-panel-bg);
+  --panel-border: var(--cy-border);
+  --card: var(--cy-panel-bg);
+  --input-bg: rgba(0, 0, 0, 0.4);
+}
+
+/* Global Background Setup */
+body {
+  background-color: var(--cy-bg);
+  color: var(--cy-text-primary);
+  font-family: var(--cy-font-sans);
+}
+
+/* Base Panel Container */
+.cy-panel {
+  background: var(--cy-panel-bg);
+  backdrop-filter: var(--cy-backdrop);
+  -webkit-backdrop-filter: var(--cy-backdrop);
+  border: 1px solid var(--cy-border);
+  border-radius: 0px 6px 0px 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Panel Corner Brackets (Cyber aesthetic) */
+.cy-panel::before,
+.cy-panel::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--cy-border-highlight);
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 11
+}
+.cy-panel::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+.cy-panel::after {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+.cy-panel:hover::before,
+.cy-panel:hover::after {
+  opacity: 1;
+}
+
+/* Modifiers for absolute popups (Dropdowns, PizzINT, etc) */
+.cy-popup {
+  position: absolute !important;
+  z-index: 1000;
+}
+
+/* Panel Header */
+.cy-panel-header {
+  padding: 12px 16px;
+  background: linear-gradient(90deg, rgba(3, 10, 16, 0.9) 0%, rgba(6, 15, 25, 0.8) 100%);
+  border-bottom: 1px solid var(--cy-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+}
+
+.cy-panel-title {
+  font-family: var(--cy-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--cy-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cy-panel-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--cy-cyan);
+  border-radius: 50%;
+  box-shadow: var(--cy-glow-cyan);
+}
+
+/* Panel Body */
+.cy-panel-body {
+  padding: 16px;
+}
+
+/* Typography Helpers - Modernizer */
+.cy-text-highlight {
+  color: var(--cy-cyan);
+  text-shadow: 0 0 5px var(--cy-cyan-dim);
+  font-weight: 500;
+}
+
+.cy-text-alert {
+  color: var(--cy-pink);
+  text-shadow: 0 0 5px rgba(249, 47, 96, 0.3);
+  font-weight: 500;
+}
+
+.cy-text-mono {
+  font-family: var(--cy-font-mono);
+  font-size: 0.85em;
+}
+
+/* Badges (Highlighted markers for data density) */
+.cy-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--cy-font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--cy-text-secondary);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.cy-badge-critical {
+  background: rgba(249, 47, 96, 0.15);
+  color: var(--cy-pink);
+  border-color: rgba(249, 47, 96, 0.4);
+  box-shadow: inset 0 0 8px rgba(249, 47, 96, 0.2);
+}
+
+.cy-badge-active {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--cy-cyan);
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.2);
+}
+
+.cy-badge-high {
+  background: rgba(255, 204, 0, 0.15);
+  color: var(--cy-yellow);
+  border-color: rgba(255, 204, 0, 0.4);
+}
+
+.cy-badge-low {
+  background: rgba(0, 255, 102, 0.15);
+  color: var(--cy-green);
+  border-color: rgba(0, 255, 102, 0.4);
+}
+
+/* Data Rows / Lists */
+.cy-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cy-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.cy-data-row:hover {
+  background: rgba(0, 229, 255, 0.05);
+  border-color: rgba(0, 229, 255, 0.2);
+  transform: translateX(2px);
+}
+
+/* Custom Scrollbars */
+.cy-scrollable::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.cy-scrollable::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.cy-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.3);
+  border-radius: 4px;
+}
+.cy-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 229, 255, 0.6);
+}
+
+/* Modals / Dialogs overrides */
+.cy-modal-overlay {
+  background: rgba(3, 10, 16, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.cy-modal-content {
+  background: var(--cy-panel-bg);
+  border: 1px solid var(--cy-border-highlight);
+  box-shadow: 0 0 40px rgba(0, 210, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Scanning pulse effect for active / loading states */
+@keyframes cy-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.cy-scanning::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cy-cyan), transparent);
+  opacity: 0.5;
+  animation: cy-scanline 3s linear infinite;
+  pointer-events: none;
+}
+
+/* Generic Control Overrides within Cyber Theme */
+.cy-panel select,
+.cy-panel input,
+.cy-panel textarea,
+.cy-panel button:not(.close-btn):not(.mobile-menu-close) {
+  background: var(--cy-panel-bg);
+  color: var(--cy-text-primary);
+  border: 1px solid var(--cy-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-family: var(--cy-font-sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.cy-panel select:focus,
+.cy-panel input:focus,
+.cy-panel textarea:focus,
+.cy-panel button:focus:not(.close-btn):not(.mobile-menu-close) {
+  border-color: var(--cy-border-highlight);
+  box-shadow: var(--cy-glow-cyan);
+}
+
+.cy-panel select option {
+  background: var(--cy-bg);
+  color: var(--cy-text-primary);
+}
+
+/* Layer Toggles & Switches within panels */
+.cy-panel .layer-toggle,
+.cy-panel .switch,
+.layer-toggle,
+.time-btn {
+  border: 0.5px solid var(--cy-border) !important;
+  color: var(--cy-text-secondary) !important;
+  border-radius: 4px;
+  transition: all 0.2s;
+  padding: 6px 8px;
+}
+
+.cy-panel .layer-toggle:hover,
+.layer-toggle:hover,
+.time-btn:hover {
+  background: rgba(0, 229, 255, 0.05) !important;
+  border-color: var(--cy-cyan) !important;
+  color: var(--cy-text-primary) !important;
+}
+
+.cy-panel .layer-toggle.active,
+.cy-panel .switch.active,
+.layer-toggle.active,
+.time-btn.active {
+  background: rgba(0, 229, 255, 0.3) !important;
+  color: #fff !important;
+  border-color: var(--cy-cyan) !important;
+  box-shadow: inset 0 0 12px rgba(0, 229, 255, 0.4), 0 0 8px rgba(0, 229, 255, 0.2) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Specific overrides for download banner drop down */
+.cy-panel .dl-dd-btn {
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--cy-text-primary);
+  border: 1px solid var(--cy-border);
+  transition: background 0.2s, border-color 0.2s;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  text-decoration: none;
+  display: block;
+}
+
+.cy-panel .dl-dd-btn:hover {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: var(--cy-cyan);
+  color: var(--cy-text-primary);
+}
+
+.cy-panel .dl-dd-btn.primary {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--cy-cyan);
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+.cy-panel .dl-dd-btn.primary:hover {
+  background: rgba(0, 229, 255, 0.25);
+  box-shadow: var(--cy-glow-cyan);
+}

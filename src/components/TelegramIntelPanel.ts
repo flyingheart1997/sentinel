@@ -21,7 +21,7 @@ export class TelegramIntelPanel extends Panel {
       title: t('panels.telegramIntel'),
       showCount: true,
       trackActivity: true,
-      infoTooltip: t('components.telegramIntel.infoTooltip'),
+      infoTooltip: t('components.telegramIntel.infoTooltip')
     });
     this.createTabs();
     this.showLoading(t('components.telegramIntel.loading'));

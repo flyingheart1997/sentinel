@@ -85,6 +85,14 @@ export async function switchVariant(newVariant: string) {
     setSiteVariant(newVariant);
     updateVariantUI(newVariant);
 
+    // 3. Clear URL state to prevent old variant settings (layers, zoom, center) from persisting
+    if (window.location.search || window.location.hash) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = '';
+        window.history.replaceState(null, '', url.toString());
+    }
+
     const container = document.getElementById('app');
     if (container) container.innerHTML = '';
 

@@ -129,7 +129,7 @@ const layers = {
   tradeRoutes: false,
   iranAttacks: false,
 
-  ciiChoropleth: false,
+  ciiChoropleth: false,  maritime: false,
   dayNight: false,
 };
 

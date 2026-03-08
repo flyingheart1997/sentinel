@@ -127,7 +127,6 @@ import { fetchPositiveGeoEvents, geocodePositiveNewsItems, type PositiveGeoEvent
 import type { HappyContentCategory } from '@/services/positive-classifier';
 import { fetchKindnessData } from '@/services/kindness-data';
 import { getPersistentCache, setPersistentCache } from '@/services/persistent-cache';
-import { fetchCachedRiskScores } from '@/services/cached-risk-scores';
 import type { ThreatLevel as ClientThreatLevel } from '@/services/threat-classifier';
 import type { NewsItem as ProtoNewsItem, ThreatLevel as ProtoThreatLevel } from '@/generated/client/worldmonitor/news/v1/service_client';
 
@@ -163,6 +162,7 @@ const CYBER_LAYER_ENABLED = import.meta.env.VITE_ENABLE_CYBER_LAYER === 'true';
 export interface DataLoaderCallbacks {
   renderCriticalBanner: (postures: TheaterPostureSummary[]) => void;
   refreshOpenCountryBrief: () => void;
+  updateLoadingProgress: (percent: number, message: string) => void;
 }
 
 export class DataLoaderManager implements AppModule {
@@ -301,43 +301,32 @@ export class DataLoaderManager implements AppModule {
       }
     };
 
-    const tasks: Array<{ name: string; task: Promise<void> }> = [
-      { name: 'news', task: runGuarded('news', () => this.loadNews()) },
+    const tasks: Array<{ name: string; label: string; task: Promise<void> }> = [
+      { name: 'news', label: 'News Feeds', task: runGuarded('news', () => this.loadNews()) },
     ];
 
-    // Happy variant only loads news data -- skip all geopolitical/financial/military data
     if (SITE_VARIANT !== 'happy') {
-      tasks.push({ name: 'markets', task: runGuarded('markets', () => this.loadMarkets()) });
-      tasks.push({ name: 'predictions', task: runGuarded('predictions', () => this.loadPredictions()) });
-      tasks.push({ name: 'pizzint', task: runGuarded('pizzint', () => this.loadPizzInt()) });
-      tasks.push({ name: 'fred', task: runGuarded('fred', () => this.loadFredData()) });
-      tasks.push({ name: 'oil', task: runGuarded('oil', () => this.loadOilAnalytics()) });
-      tasks.push({ name: 'spending', task: runGuarded('spending', () => this.loadGovernmentSpending()) });
-      tasks.push({ name: 'bis', task: runGuarded('bis', () => this.loadBisData()) });
+      tasks.push({ name: 'markets', label: 'Market Data', task: runGuarded('markets', () => this.loadMarkets()) });
+      tasks.push({ name: 'predictions', label: 'Prediction Markets', task: runGuarded('predictions', () => this.loadPredictions()) });
+      tasks.push({ name: 'pizzint', label: 'Signal Analysis', task: runGuarded('pizzint', () => this.loadPizzInt()) });
+      tasks.push({ name: 'fred', label: 'Economic Indicators', task: runGuarded('fred', () => this.loadFredData()) });
+      tasks.push({ name: 'oil', label: 'Energy Analytics', task: runGuarded('oil', () => this.loadOilAnalytics()) });
+      tasks.push({ name: 'spending', label: 'Fiscal Data', task: runGuarded('spending', () => this.loadGovernmentSpending()) });
+      tasks.push({ name: 'bis', label: 'International Banking', task: runGuarded('bis', () => this.loadBisData()) });
 
-      // Trade policy data (FULL and FINANCE only)
       if (SITE_VARIANT === 'full' || SITE_VARIANT === 'finance') {
-        tasks.push({ name: 'tradePolicy', task: runGuarded('tradePolicy', () => this.loadTradePolicy()) });
-        tasks.push({ name: 'supplyChain', task: runGuarded('supplyChain', () => this.loadSupplyChain()) });
+        tasks.push({ name: 'tradePolicy', label: 'Trade Policy', task: runGuarded('tradePolicy', () => this.loadTradePolicy()) });
+        tasks.push({ name: 'supplyChain', label: 'Supply Chain', task: runGuarded('supplyChain', () => this.loadSupplyChain()) });
       }
     }
 
-    // Progress charts data (happy variant only)
     if (SITE_VARIANT === 'happy') {
-      tasks.push({
-        name: 'progress',
-        task: runGuarded('progress', () => this.loadProgressData()),
-      });
-      tasks.push({
-        name: 'species',
-        task: runGuarded('species', () => this.loadSpeciesData()),
-      });
-      tasks.push({
-        name: 'renewable',
-        task: runGuarded('renewable', () => this.loadRenewableData()),
-      });
+      tasks.push({ name: 'progress', label: 'Progress Charts', task: runGuarded('progress', () => this.loadProgressData()) });
+      tasks.push({ name: 'species', label: 'Biodiversity', task: runGuarded('species', () => this.loadSpeciesData()) });
+      tasks.push({ name: 'renewable', label: 'Renewable Energy', task: runGuarded('renewable', () => this.loadRenewableData()) });
       tasks.push({
         name: 'happinessMap',
+        label: 'Happiness Index',
         task: runGuarded('happinessMap', async () => {
           const data = await fetchHappinessScores();
           this.ctx.map?.setHappinessScores(data);
@@ -345,6 +334,7 @@ export class DataLoaderManager implements AppModule {
       });
       tasks.push({
         name: 'renewableMap',
+        label: 'Green Infrastructure',
         task: runGuarded('renewableMap', async () => {
           const installations = await fetchRenewableInstallations();
           this.ctx.map?.setRenewableInstallations(installations);
@@ -352,55 +342,52 @@ export class DataLoaderManager implements AppModule {
       });
     }
 
-    // Global giving activity data (all variants)
     tasks.push({
       name: 'giving',
+      label: 'Philanthropy',
       task: runGuarded('giving', async () => {
         const givingResult = await fetchGivingSummary();
-        if (!givingResult.ok) {
-          dataFreshness.recordError('giving', 'Giving data unavailable (retaining prior state)');
-          return;
+        if (givingResult.ok) {
+          (this.ctx.panels['giving'] as GivingPanel)?.setData(givingResult.data);
         }
-        const data = givingResult.data;
-        (this.ctx.panels['giving'] as GivingPanel)?.setData(data);
-        if (data.platforms.length > 0) dataFreshness.recordUpdate('giving', data.platforms.length);
       }),
     });
 
     if (SITE_VARIANT === 'full') {
-      try {
-        const cached = await fetchCachedRiskScores().catch(() => null);
-        if (cached && cached.cii.length > 0) {
-          (this.ctx.panels['cii'] as CIIPanel)?.renderFromCached(cached);
-          this.ctx.map?.setCIIScores(cached.cii.map(s => ({ code: s.code, score: s.score, level: s.level })));
-          this.ctx.map?.setLayerReady('ciiChoropleth', true);
-        }
-      } catch { /* non-fatal */ }
-      tasks.push({ name: 'intelligence', task: runGuarded('intelligence', () => this.loadIntelligenceSignals()) });
+      tasks.push({ name: 'intelligence', label: 'Geopolitical Intelligence', task: runGuarded('intelligence', () => this.loadIntelligenceSignals()) });
+      tasks.push({ name: 'firms', label: 'Corporate Intelligence', task: runGuarded('firms', () => this.loadFirmsData()) });
     }
 
-    if (SITE_VARIANT === 'full') tasks.push({ name: 'firms', task: runGuarded('firms', () => this.loadFirmsData()) });
-    if (this.ctx.mapLayers.natural) tasks.push({ name: 'natural', task: runGuarded('natural', () => this.loadNatural()) });
-    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.weather) tasks.push({ name: 'weather', task: runGuarded('weather', () => this.loadWeatherAlerts()) });
-    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.ais) tasks.push({ name: 'ais', task: runGuarded('ais', () => this.loadAisSignals()) });
-    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.cables) tasks.push({ name: 'cables', task: runGuarded('cables', () => this.loadCableActivity()) });
-    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.cables) tasks.push({ name: 'cableHealth', task: runGuarded('cableHealth', () => this.loadCableHealth()) });
-    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.flights) tasks.push({ name: 'flights', task: runGuarded('flights', () => this.loadFlightDelays()) });
-    if (SITE_VARIANT !== 'happy' && CYBER_LAYER_ENABLED && this.ctx.mapLayers.cyberThreats) tasks.push({ name: 'cyberThreats', task: runGuarded('cyberThreats', () => this.loadCyberThreats()) });
-    if (SITE_VARIANT !== 'happy') tasks.push({ name: 'iranAttacks', task: runGuarded('iranAttacks', () => this.loadIranEvents()) });
-    if (SITE_VARIANT !== 'happy' && (this.ctx.mapLayers.techEvents || SITE_VARIANT === 'tech')) tasks.push({ name: 'techEvents', task: runGuarded('techEvents', () => this.loadTechEvents()) });
+    if (this.ctx.mapLayers.natural) tasks.push({ name: 'natural', label: 'Earthquake Monitor', task: runGuarded('natural', () => this.loadNatural()) });
+    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.weather) tasks.push({ name: 'weather', label: 'Weather Alerts', task: runGuarded('weather', () => this.loadWeatherAlerts()) });
+    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.ais) tasks.push({ name: 'ais', label: 'Maritime Tracking', task: runGuarded('ais', () => this.loadAisSignals()) });
+    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.cables) {
+      tasks.push({ name: 'cables', label: 'Infrastructure Status', task: runGuarded('cables', () => this.loadCableActivity()) });
+      tasks.push({ name: 'cableHealth', label: 'Subsea Integrity', task: runGuarded('cableHealth', () => this.loadCableHealth()) });
+    }
+    if (SITE_VARIANT !== 'happy' && this.ctx.mapLayers.flights) tasks.push({ name: 'flights', label: 'Aviation Patterns', task: runGuarded('flights', () => this.loadFlightDelays()) });
+    if (SITE_VARIANT !== 'happy' && CYBER_LAYER_ENABLED && this.ctx.mapLayers.cyberThreats) tasks.push({ name: 'cyberThreats', label: 'Cyber Defense', task: runGuarded('cyberThreats', () => this.loadCyberThreats()) });
+    if (SITE_VARIANT !== 'happy') tasks.push({ name: 'iranAttacks', label: 'Regional Conflict', task: runGuarded('iranAttacks', () => this.loadIranEvents()) });
+    if (SITE_VARIANT !== 'happy' && (this.ctx.mapLayers.techEvents || SITE_VARIANT === 'tech')) tasks.push({ name: 'techEvents', label: 'Technology Events', task: runGuarded('techEvents', () => this.loadTechEvents()) });
 
     if (SITE_VARIANT === 'tech') {
-      tasks.push({ name: 'techReadiness', task: runGuarded('techReadiness', () => (this.ctx.panels['tech-readiness'] as TechReadinessPanel)?.refresh()) });
+      tasks.push({ name: 'techReadiness', label: 'R&D Maturity', task: runGuarded('techReadiness', () => (this.ctx.panels['tech-readiness'] as TechReadinessPanel)?.refresh()) });
     }
 
-    const results = await Promise.allSettled(tasks.map(t => t.task));
+    let completed = 0;
+    const total = tasks.length;
 
-    results.forEach((result, idx) => {
-      if (result.status === 'rejected') {
-        console.error(`[App] ${tasks[idx]?.name} load failed:`, result.reason);
-      }
-    });
+    const reportProgress = (_name: string, label: string) => {
+      completed++;
+      const percent = (completed / total) * 100;
+      this.callbacks.updateLoadingProgress(percent, `LOADING ${label.toUpperCase()}`);
+    };
+
+    // Initialize progress at 5%
+    this.callbacks.updateLoadingProgress(5, 'INITIALIZING ENGINE');
+
+    const wrappedTasks = tasks.map(t => t.task.then(() => reportProgress(t.name, t.label)));
+    await Promise.allSettled(wrappedTasks);
 
     this.updateSearchIndex();
   }

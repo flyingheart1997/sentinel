@@ -435,17 +435,17 @@ export class SearchManager implements AppModule {
         break;
 
       case 'view':
-        if (action === 'dark' || action === 'light') {
-          setTheme(action);
+        if (action === 'dark') {
+          setTheme();
         } else if (action === 'fullscreen') {
           if (document.fullscreenElement) {
-            try { void document.exitFullscreen()?.catch(() => {}); } catch {}
+            try { void document.exitFullscreen()?.catch(() => { }); } catch { }
           } else {
             const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void };
             if (el.requestFullscreen) {
-              try { void el.requestFullscreen()?.catch(() => {}); } catch {}
+              try { void el.requestFullscreen()?.catch(() => { }); } catch { }
             } else if (el.webkitRequestFullscreen) {
-              try { el.webkitRequestFullscreen(); } catch {}
+              try { el.webkitRequestFullscreen(); } catch { }
             }
           }
         } else if (action === 'settings') {
