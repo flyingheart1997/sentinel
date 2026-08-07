@@ -10,6 +10,7 @@ AI-powered real-time global intelligence dashboard aggregating news, markets, ge
 ![Version](https://img.shields.io/badge/version-2.5.1-blue)
 
 ![World Monitor Dashboard](../new-world-monitor.png)
+![Satellite Orbit Dashboard](../satellite-dashboard.png)
 
 ## Platform Variants
 
